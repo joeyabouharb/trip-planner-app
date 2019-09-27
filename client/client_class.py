@@ -3,14 +3,15 @@ Defines a client class to handle request from the tripplanner api
 hands back data filtered from the trip planner back to
 the server. Caching Class 
 """
+import datetime as date
 
 import client.services.swagger_instance as instance
-from datetime import datetime, timedelta
+from datetime import datetime
 from swagger_client.rest import ApiException
 from client.config.environment import JSONFORMAT, COORDINATEFORMAT
 from client.models.departure_info import DepartureInfo
-from client.services.data_formats import (
-    generator_departure_info, create_date_and_time
+from client.services.data_factory import (
+    generator_departure_info, create_date_and_time, generator_trip_data
 )
 
 
@@ -81,7 +82,7 @@ class Client():
 
     def find_trips_for_stop(
         self, departure, destination,
-        dep='dep', calc_number_of_trips='1', date_time=datetime.today()
+        dep='dep', calc_number_of_trips='6', date_time=datetime.today()
     ):
         """
         """
@@ -91,7 +92,7 @@ class Client():
         date, time = create_date_and_time(date_time, format_date, format_time)
         req = self._instance.tfnsw_trip_request2(
             JSONFORMAT, COORDINATEFORMAT, dep, date, time, *departure,
-            *destination, calc_number_of_trips=calc_number_of_trips)
+            *destination, tf_nswtr="true", calc_number_of_trips=calc_number_of_trips)
         self.result = req
         self.error = req.error
 
@@ -108,9 +109,10 @@ if __name__ == '__main__':
     for testing only
     """
     client = Client()
-    client.find_trips_for_stop(('any','10101112'), ('any', '10101397'))
-    input(client.result)
-    client.find_stops_by_name('platform', 'Belmore')
+    client.find_trips_for_stop(('any','10101398'), ('any', '10101112'))
+    generator_trip_data(client.result.journeys)
+
+    client.find_stops_by_name('platform', 'North Sydney')
     locations = client.result.locations
     if not client.error:
         for i, location in enumerate(locations):
@@ -119,7 +121,7 @@ if __name__ == '__main__':
         selected_location = locations[selected]
         _id = selected_location.id
         exclusions = 0 # what information to exclude
-        client.find_destinations_for('stop', _id, exclusions)
+        client.find_destinations_for('any', _id, exclusions)
         events = client.result # if no information is available for the searched stop go to next search
         if client.error or not events.stop_events:
             exit('no stop found?')

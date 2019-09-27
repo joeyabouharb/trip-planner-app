@@ -22,6 +22,6 @@ class DepartureInfo():
 
     def to_dict(self):
         """
-        returns class properties as dict
+        returns class properties as dict, reserved for api usage
         """
         return self.__dict__
