@@ -1,0 +1,6 @@
+# An example of an environment.py file
+API_KEY = #PUT KEY HERE
+
+JSONFORMAT = "rapidJSON"
+COORDINATEFORMAT = "EPSG:4326"
+
