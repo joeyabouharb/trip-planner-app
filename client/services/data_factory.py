@@ -1,6 +1,8 @@
 """
-handles yielding meaningful data to client by
-filtering and using algorithms
+handles yielding/returning meaningful data to client by
+filtering through data like stop information, departures and journey info
+and converting data types
+such as dates, etc
 """
 from datetime import datetime
 from dateutil import tz
@@ -10,10 +12,13 @@ from swagger_client.models import (
 from client.services.app_locals import VALID_TRANSPORT
 
 
-def date_parser(departure_time, time_format="%Y-%m-%dT%H:%M:%SZ"):
+def date_parser(departure_time: str, time_format="%Y-%m-%dT%H:%M:%SZ"):
     """
     parses a date string using the specified date_time_format,
     and converts it to Australian Time localtime
+        Args:
+            departure_time: str -> time of departure in string format, implied UTC format
+            time_format: str -> format to aid in parsing string to datetime
     """
     # Specify Timezone to convert to and from ie UTC -> Sydney localtime
     from_zone = tz.gettz('UTC')
@@ -87,16 +92,31 @@ def create_date_and_time(
 
 def generator_trip_data(journeys):
     """
-    create trip date. TBD
+    yields trip information from journeys:
+        Args:
+            journeys: list -> list of journeys, recieved from the API Call
+        Yields:
+            total_fare: float -> cost of journey,
+            total_duration: float -> duration (in minutes) of journey,
+            summary: list -> types of transport used in journey,
+            depart_day, depart_time: str -> departure day/time information,
+            arrive_day, arrive_time: str -> arrival day/time information,
+            stops: dict -> all stops in journey
     """
 
     def get_stop_info(stops, legs):
         """
+        modifies existing dictionary and appends
+        new stopping information for each 'leg' in a journey
+            Args:
+                stops: dict -> containing information about stops
+                legs -> all legs in a journey. ie. transport and network changes
         """
+
         for leg in legs:
             for seq_num, sequence in enumerate(leg.stop_sequence):
                 if seq_num == 0:
-                    # create new key entry for each leg
+                    # create new key entry for each leg/ network change in journey
                     type_ = (
                         leg.transportation.name
                         if leg.transportation.name is not None else 'walk'
