@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+    <html>
+        <head>
+        </head>
+        <body>
+            <section>
+                <h1> {% block title %} {% endblock %}</h1>
+                <nav>
+                    <a href="/">Home</a>
+                    <a href="/stops">Stop Departures</a>
+                    <a href="trips">Trip Planner</a>
+                <nav>
+            </section>
+            <section>
+            {% block content %} {% endblock %}
+            </section>
+        </body>
+    </html>

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+    {% block title %} Departures {% endblock %}
+    {% block content %}
+        <section>
+            <h2>Departures:</h2>
+            <div>
+            {% for departure in departures_info %}
+            {% set hours, minutes, seconds = departure.time_to_arrive %}
+                <section>
+                    {% if loop.changed(departure.location) %}
+                        <h3> {{ departure.location }} </h3>
+                    {% endif %}
+                    <p>{{ hours }} hours, {{ minutes }} minutes, {{ seconds }} and seconds</p>
+                    <p>{{ departure.route }} to {{ departure.dest }}
+                </section>
+            {% endfor %}
+            </ul>
+        </section>
+    {% endblock %}

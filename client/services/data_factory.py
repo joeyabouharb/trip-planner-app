@@ -10,22 +10,40 @@ from swagger_client.models import (
     DepartureMonitorResponse
 )
 from client.services.app_locals import VALID_TRANSPORT
+from client.models.departure_info import DepartureInfo
+
+def generator_stop_information(client, selected_types, query):
+    """
+    get stop information
+    """
+
+    locations = client.result.locations
+    for location in locations:
+
+        if not location.modes:
+            continue
+        if not location.parent.name == query.capitalize():
+            continue
+        if not selected_types or\
+            selected_types in location.modes:
+            yield location.id, location.name
 
 
 def date_parser(departure_time: str, time_format="%Y-%m-%dT%H:%M:%SZ"):
     """
-    parses a date string using the specified date_time_format,
+    parses a date string using the specified date_time_format
     and converts it to Australian Time localtime
-        Args:
-            departure_time: str -> time of departure in string format, implied UTC format
-            time_format: str -> format to aid in parsing string to datetime
+        \nArgs:
+            \n`departure_time`: str -> time of departure in string format, implied UTC format
+            \n`time_format`: str -> format to aid in parsing string to datetime
     """
     # Specify Timezone to convert to and from ie UTC -> Sydney localtime
+    # this pulls localtime information from /usr/share/zoninfo (linux sys)
+    # this includes daylight savings info eg. AEST-10AEDT,M10.1.0,M4.1.0/3
     from_zone = tz.gettz('UTC')
     to_zone = tz.gettz('Australia/Sydney')
-
-    # replace will specify the date format to convert from
-    # and astimezone will convert it to Australian GMT
+    # replace will specify the date format to convert from (UTC)
+    # and astimezone will convert it to specified timezone eg. Australian EST
     parsed_date = datetime.strptime(
         departure_time, time_format
     ).replace(tzinfo=from_zone).astimezone(to_zone)
@@ -37,23 +55,30 @@ def date_parser(departure_time: str, time_format="%Y-%m-%dT%H:%M:%SZ"):
 def generator_departure_info(
         events: DepartureMonitorResponse
 ) -> (int, int, int, str, str):
-    """
-    yields departure information as
-    hours: int
-    minutes: int
-    seconds: int
-    routenumber: str
-    destination: str
+    """## Generate departure information for a stop
+    \nArgs:
+        \n- `events`: `DepartureMonitorResponse` -> stop events for a specified location
+        \n- `of_type`: str -> specifieed stop type ID to filter. as defined in the API docs
+    \nyields:
+        \n- `hours`: int,
+        \n- `minutes`: int,
+        \n- `seconds`: int,
+        \n- `route`: str,
+        \n- `dest`: str,
+        \n- `location`: str
     """
     for event in events.stop_events:
+        transport_type = event.transportation.product.icon_id
         transportation = event.transportation
         route = transportation.number
         dest = transportation.destination.name
-        # location = event.location
-
+        location = event.location.name
+        id_ = event.location.id
+        type_ = VALID_TRANSPORT[transport_type]
         departure_time = event.departure_time_planned
         parsed_date = date_parser(departure_time)
-        today = datetime.now().astimezone(tz.gettz('Australia/Sydney'))
+        # ensure datetime is formatted with timezone info
+        today = datetime.now(tz=tz.gettz('Australia/Sydney'))
         countdown = parsed_date - today
 
         # if the train has already passed skip to next data set
@@ -67,9 +92,7 @@ def generator_departure_info(
         hours, remainder = divmod(countdown.seconds, 3600)
         # devide remainder by 60 remainder which will be seconds
         minutes, seconds = divmod(remainder, 60)
-        yield (
-            hours, minutes, seconds, route, dest
-        )
+        yield DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
 
 
 def create_date_and_time(
@@ -79,51 +102,55 @@ def create_date_and_time(
     returns a tuple of strings containing a formatted
     date and time strings, taking in a datetime object
     and the specified formats for date and time in `format_date` and `format_time`
-        Args:
-            date: datetime - date to format to str
-            format_date: str - specified date format
-            format_time: str - specified time format
+        \nArgs:
+            \ndate: datetime - date to format to str,
+            \nformat_date: str - specified date format,
+            \nformat_time: str - specified time format,
     """
 
     today = datetime.strftime(date, format_date)
     time = datetime.strftime(date, format_time)
     return today, time
 
+def generator_stop_info(stops, _type):
+    """
+    """
+    for stop in stops:
+        pass
 
-def generator_trip_data(journeys):
+def generator_trip_data(journeys) -> (float, float, list, tuple, tuple, dict):
     """
     yields trip information from journeys:
-        Args:
-            journeys: list -> list of journeys, recieved from the API Call
-        Yields:
-            total_fare: float -> cost of journey,
-            total_duration: float -> duration (in minutes) of journey,
-            summary: list -> types of transport used in journey,
-            depart_day, depart_time: str -> departure day/time information,
-            arrive_day, arrive_time: str -> arrival day/time information,
-            stops: dict -> all stops in journey
+        \nArgs:
+            \njourneys: list -> list of journeys, recieved from the API Call\n
+        \nYields:
+            \ntotal_fare: float -> cost of journey,
+            \ntotal_duration: float -> duration (in minutes) of journey,
+            \nsummary: list -> types of transport used in journey,
+            \ndepart_day, depart_time: tuple -> (str, str) -> departure day/time information,
+            \narrive_day, arrive_time: tuple -> (str, str) -> arrival day/time information,
+            \nstops: dict -> all stops in journey
     """
 
     def get_stop_info(stops, legs):
         """
         modifies existing dictionary and appends
         new stopping information for each 'leg' in a journey
-            Args:
-                stops: dict -> containing information about stops
-                legs -> all legs in a journey. ie. transport and network changes
+            \nArgs:
+                \n`stops`: dict -> containing information about stops,
+                \n`legs`: JourneyLegs -> all legs in a journey. ie. transport and network changes,
         """
-
         for leg in legs:
             for seq_num, sequence in enumerate(leg.stop_sequence):
                 if seq_num == 0:
                     # create new key entry for each leg/ network change in journey
                     type_ = (
                         leg.transportation.name
-                        if leg.transportation.name is not None else 'walk'
+                        if leg.transportation.name is not None else 'walk' # trip is walk if None
                     )
                     stops[type_] = []
 
-                # attempt to get live updates/ est. otherwise get planned dep/arrival times
+                # attempt to get live updates/ estimated otherwise get planned dep/arrival times
                 if sequence.departure_time_estimated is not None:
                     departure = date_parser(sequence.departure_time_estimated)
                 elif sequence.arrival_time_estimated is not None:
@@ -139,6 +166,7 @@ def generator_trip_data(journeys):
                     # parse dates and return the formatted time string
                     _, departure = create_date_and_time(departure, '', '%H:%M')
                 stops[type_].append(f'{sequence.name} arrives: {departure}')
+    # end of function
 
     for journey in journeys:
 

@@ -15,5 +15,4 @@ def configure_swagger()\
     """
     config = Configuration()
     config.access_token = API_KEY
-
     return config

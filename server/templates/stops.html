@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+    {% block title %} Search for stop:  {% endblock %}
+    {% block content %}
+    <h2> Search Departures By stop </h2>
+    <div>
+        <form method="GET" action="/stops">
+            <input type="text" name="query" size=30/>
+            <div>
+                <input type="checkbox" name="types" value="1"/> <label> Trains <label/> 
+            </div>
+            <div>
+                <input type="checkbox" name="types" value="4"/> <label> Light Rail <label/> 
+            </div>
+            <div>
+                <input type="checkbox" name="types" value="5"/> <label> Bus <label/> 
+            </div>
+            <button type="submit"> search </button>
+        </form>
+    <div>
+    <section>
+        <ul>
+        {% for id, location in data %}
+            <li>
+                <a href="/departures/{{id}}?type={{ type }}">{{location}}</a>
+            </li>
+
+        {% endfor %}
+        </ul>
+        {% if not data %}
+            <p> No Results </p>
+        {% endif %}
+    <section/>
+    {% endblock %}
