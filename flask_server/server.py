@@ -7,6 +7,7 @@ Initialises Flask Server with routes to:
     - /trip-planner
 """
 
+
 from operator import attrgetter
 
 from flask import (
