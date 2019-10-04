@@ -3,6 +3,7 @@
     <words>
       <w>aedt</w>
       <w>aest</w>
+      <w>gunicorn</w>
       <w>jinja</w>
       <w>zoneinfo</w>
     </words>
