@@ -25,7 +25,7 @@ INSTALL_REQUIRES = [
     "urllib3",
     "Werkzeug",
     "wrapt",
-    "swagger_client"
+    "swagger_client",
     "trip_planner",
 ]
 DEPENDENCY_LINKS = [
