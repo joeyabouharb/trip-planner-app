@@ -50,5 +50,4 @@ setup(
     include_package_data=True,
     long_description=LONG_DESC,
     install_requires=INSTALL_REQUIRES,
-    dependency_links=DEPENDENCY_LINKS
 )
