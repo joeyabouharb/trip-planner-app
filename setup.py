@@ -20,15 +20,12 @@ INSTALL_REQUIRES = [
     "lazy-object-proxy",
     "MarkupSafe",
     "mccabe",
-    "pycodestyle",
-    "pyflakes"
-    "pylint"
-    "python-dateutil"
     "six",
     "typed-ast",
     "urllib3",
     "Werkzeug",
-    "wrapt"
+    "wrapt",
+    "trip_planner"
 ]
 DEPENDENCY_LINKS = [
     "https://github.com/joeyabouharb/trip-planner-app.git@f349e18e32c64f5e1c1a57a0b83ec05f8e3c2fc3#egg=trip_planner"
@@ -53,6 +50,6 @@ setup(
     packages=find_packages(exclude='*.egg-info'),
     include_package_data=True,
     long_description=LONG_DESC,
-    install_requires=INSTALL_REQUIRES,
-    dependency_links=DEPENDENCY_LINKS
+    dependency_links=DEPENDENCY_LINKS,
+    install_requires=INSTALL_REQUIRES
 )
