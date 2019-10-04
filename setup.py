@@ -27,7 +27,7 @@ INSTALL_REQUIRES = [
     "wrapt"
 ]
 DEPENDENCY_LINKS = [
-    "git+https://github.com/joeyabouharb/opendata-swagger.git"
+    "https://github.com/joeyabouharb/opendata-swagger.git"
 ]
 LONG_DESC = """\
     This application handles communication between
@@ -49,6 +49,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     long_description=LONG_DESC,
-    dependency_links=DEPENDENCY_LINKS,
     install_requires=INSTALL_REQUIRES
 )
