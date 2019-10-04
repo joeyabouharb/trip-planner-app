@@ -24,10 +24,12 @@ INSTALL_REQUIRES = [
     "typed-ast",
     "urllib3",
     "Werkzeug",
-    "wrapt"
+    "wrapt",
+    "swagger-client @ https://github.com/joeyabouharb/opendata-swagger.git"
 ]
 DEPENDENCY_LINKS = [
-    "https://github.com/joeyabouharb/opendata-swagger/raw/master/dist/swagger_client-1.0.0-py3.7.egg"
+    "https://github.com/joeyabouharb/opendata-swagger/tarball/master#egg=swagger-client-1.0",
+    "https://github.com/joeyabouharb/trip-planner-app.git@f349e18e32c64f5e1c1a57a0b83ec05f8e3c2fc3#egg=trip_planner"
 ]
 LONG_DESC = """\
     This application handles communication between

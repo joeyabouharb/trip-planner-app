@@ -1,10 +1,12 @@
 #!/home/joey/Documents/trip-planner-assessment/venv/bin/python3.7
-# -*- coding: utf-8 -*-
+# EASY-INSTALL-ENTRY-SCRIPT: 'isort==4.3.21','console_scripts','isort'
+__requires__ = 'isort==4.3.21'
 import re
 import sys
-
-from isort.main import main
+from pkg_resources import load_entry_point
 
 if __name__ == '__main__':
     sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
-    sys.exit(main())
+    sys.exit(
+        load_entry_point('isort==4.3.21', 'console_scripts', 'isort')()
+    )

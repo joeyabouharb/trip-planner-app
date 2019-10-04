@@ -1,5 +1,6 @@
+
 """
-# Flask server app
+Flask server app
 Initialises Flask Server with routes to:
     - /stop-search
     - /trips
@@ -14,7 +15,6 @@ from client.client_class import Client
 from client.services.data_factory import (
     generator_departure_info, generator_stop_information, generator_trip_data
 )
-
 from client.services.app_locals import VALID_TRANSPORT
 from operator import attrgetter
 

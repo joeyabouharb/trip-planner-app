@@ -7,7 +7,6 @@ the server. Caching Class
 import sys
 from datetime import datetime
 from dateutil import tz
-
 from swagger_client.rest import ApiException
 from swagger_client.models.departure_monitor_response import DepartureMonitorResponse
 from swagger_client.models.stop_finder_response import StopFinderResponse
