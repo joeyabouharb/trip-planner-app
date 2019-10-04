@@ -1,19 +1,20 @@
-{% extends "layout.html" %}
+{% extends "layout.jinja2" %}
     {% block title %} Search for stop:  {% endblock %}
     {% block content %}
     <h2> Search Departures By stop </h2>
     <div>
         <form method="GET" action="/stops">
-            <input type="text" name="query" size=30/>
+            <label> Search: <input type="search" name="query"/> </label>
             <div>
-                <input type="checkbox" name="train" value="1"/> <label> Trains <label/> 
+                <label> Trains <input type="checkbox" name="1" value="1"/></label>
             </div>
             <div>
-                <input type="checkbox" name="light_rail" value="4"/> <label> Light Rail <label/> 
+                <label> Light Rail: <input type="checkbox" name="4" value="1"/> </label>
             </div>
             <div>
-                <input type="checkbox" name="bus" value="5"/> <label> Bus <label/> 
+                <label> Bus: <input type="checkbox" name="5" value="1"/> </label>
             </div>
+            <label> Suburb <input name="suburb" type="checkbox"  value="1"/></label>
             <button type="submit"> search </button>
         </form>
     <div>
@@ -21,7 +22,7 @@
         <ul>
         {% for id, location in data %}
             <li>
-                <a href="/departures/{{id}}?type={{ type }}">{{location}}</a>
+                <a href="/departures/{{ id }}?type={{ type }}">{{location}}</a>
             </li>
 
         {% endfor %}
@@ -29,5 +30,5 @@
         {% if not data %}
             <p> No Results </p>
         {% endif %}
-    <section/>
+    </section>
     {% endblock %}

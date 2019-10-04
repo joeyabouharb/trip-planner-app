@@ -6,7 +6,8 @@ from swagger_client.api import TripPlannerApi
 from swagger_client.api_client import ApiClient
 from client.config.config import configure_swagger
 
-def start() -> (TripPlannerApi):
+
+def start() -> TripPlannerApi:
     """
     start a swagger instance
     """

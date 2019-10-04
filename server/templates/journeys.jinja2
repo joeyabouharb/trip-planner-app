@@ -1,0 +1,23 @@
+{% extends "layout.jinja2" %}
+{% block title %} Options for: {{ origin_name[1] }} to {{ destination_name[1] }}:{% endblock %}
+    {% block content %}
+
+        {% for trip in trips %}
+        <h1> Journey Option {{ loop.index }}: </h1>
+        <section>
+        {% for trip_info, trip_stops in trip.stops.items() %}
+        <h2> Journey Leg {{ loop.index }}: </h2>
+        <h3> {{ trip_info }} </h3>
+            {% for trip_stop in trip_stops %}
+                <p> {{ trip_stop }} </p>
+            {% endfor %}
+        {% endfor %}
+        </section>
+        <section>
+            {% set depart_day, depart_time = trip.departure %}
+            {% set arrival_day, arrival_time = trip.arrival %}
+            <p> <i>{{ depart_day }} - {{ depart_time }} to {{ arrival_day }} - {{ arrival_time }} </i></p>
+            <p style="font-size: 15px"> <b>Trip Duration: {{ trip.total_duration }} minutes Cost: {{ trip.total_fare }} </b> </p>
+        </section>
+        {% endfor %}
+    {% endblock %}

@@ -1,36 +1,41 @@
 """
-Defines a client class to handle request from the tripplanner api
+Defines a client class to handle request from the trip planner api
 hands back data filtered from the trip planner back to
 the server. Caching Class
 """
 
 import sys
 from datetime import datetime
+from dateutil import tz
 from swagger_client.rest import ApiException
+from swagger_client.models.departure_monitor_response import DepartureMonitorResponse
+from swagger_client.models.stop_finder_response import StopFinderResponse
+from swagger_client.models.trip_request_response import TripRequestResponse
 import client.services.swagger_instance as instance
 from client.config.environment import JSONFORMAT, COORDINATEFORMAT
 from client.models.departure_info import DepartureInfo
 from client.services.data_factory import (
     generator_departure_info, create_date_and_time, generator_trip_data
 )
-from dateutil import tz
+from client.services.app_locals import VALID_EXCLUSIONS
 
-class Client():
+
+class Client:
     """# Client API Class for Trip Planner
-    \nintitialises a swagger client to connect\
+    \ninitialises a swagger client to connect\
     to the trip planner api
     \n- `_instance` *protected* : TripPlannerAPI -> initialises swagger client instance
     \n- `result`: TripPlannerResponse -> Response from API server
     \n- `error`: int -> http error code / msg
     """
+
     def __init__(self):
         self._instance = instance.start()
-        self.result = {}
+        self.result = None
         self.error = None
-        self.version = '10.2.1.42' # stable version
+        self.version = '10.2.1.42'  # stable version
 
-
-    def find_stops_by_name(self, _type: str, query: str):
+    def find_stops_by_name(self, _type: str, query: str, is_id=False) -> StopFinderResponse:
         """### Find Stop by name
         \nfind a stop from a specified POI, or suburb
         \nArgs:
@@ -38,25 +43,24 @@ class Client():
             `any`, `stop`, `platform`, etc.
             \nquery: search query, usually a stop ID or a name type: (str)
         """
+        tf_nswsf = "true" if is_id else ""
         try:
             req = self._instance.tfnsw_stopfinder_request(
-                JSONFORMAT, _type, query, COORDINATEFORMAT, version=self.version
+                JSONFORMAT, _type, query, COORDINATEFORMAT, version=self.version, tf_nswsf=tf_nswsf
             )
-            self.result = req
-            self.error = req.error
+            self.error = 404 if req is None else 200
+            return req
         except ApiException as err:
             sys.exit(err)
 
     def find_stops_near_coord(self, *params):
         """
-        not implemented
         """
 
-
     def find_destinations_for(
-            self, _type: str, query: str, exclusions: object,
+            self, _type: str, query: str, transport_types: list,
             date_time=datetime.today()
-    ):
+    ) -> DepartureMonitorResponse:
         """### find destinations for specific stop/location
         find destinations for a specified stop taking in
         arrival/departure times, etc
@@ -65,11 +69,21 @@ class Client():
                 usually any or stop, refer to the API docs for more info
                 \n- `query`: str -> station to search, can be key words, suburbs, IDs, etc
         """
-        # formate datetime to a string
+
+        exclusions = {
+            'exclMOT_1': '1', 'exclMOT_4': '1', 'exclMOT_5': '1',
+            'exclMOT_7': '1', 'exclMOT_9': '1', 'exclMOT_11': '1'
+        }
+        for key, value in VALID_EXCLUSIONS.items():
+            if any(transport_type == key for transport_type in transport_types):
+                exclusions.pop(value)
+        if not transport_types[0] and len(transport_types) == 1:
+            exclusions = 0
+        # format datetime to a string
         format_date = '%Y%m%d'
         format_time = '%H%M'
 
-        date, time = create_date_and_time(date_time, format_date, format_time)
+        date_str, time = create_date_and_time(date_time, format_date, format_time)
         # sends a request to the api using the swagger instance
         try:
             # if the user wishes to exclude multiple transport options
@@ -77,25 +91,24 @@ class Client():
 
                 req = self._instance.tfnsw_dm_request(
                     JSONFORMAT, COORDINATEFORMAT, _type, query,
-                    'dep', date, time, exclusions=exclusions, mode='direct',
+                    'dep', date_str, time, exclusions=exclusions, mode='direct',
                     tf_nswdm="true", exclude_means='checkbox', version=self.version
                 )
-            else: # otherwise search normally, or just exlude one option
+            else:  # otherwise search normally, or just exclude one option
                 req = self._instance.tfnsw_dm_request(
                     JSONFORMAT, COORDINATEFORMAT, _type, query,
-                    'dep', date, time,
+                    'dep', date_str, time,
                     mode='direct', tf_nswdm="true", exclude_means=exclusions, version=self.version
                 )
         except ApiException as err:
             sys.exit(err)
 
-        self.result = req
-        self.error = req.error
-
+        self.error = 404 if req.stop_events is None else 200
+        return req
 
     def find_trips_for_stop(
             self, *args, **kwargs
-    ):
+    ) -> TripRequestResponse:
         """\n### Find Trips For Stop
         \nfind trips (possible departures) for a stop by taking in the departure origin and destination
         and a specified time and saves the result to the client `self.result` property
@@ -113,6 +126,7 @@ class Client():
                 set 'on' to return wheelchair accessible options
         """
         departure, destination, dep = args
+
         date_time = (
             datetime.now(tz=tz.gettz('Australia/Sydney'))
             if not kwargs.get('date_time', False) else kwargs['date_time']
@@ -121,19 +135,21 @@ class Client():
             5 if not kwargs.get('calc_number_of_trips', False)
             else kwargs['calc_number_of_trips']
         )
-        # formate datetime to a string
+        # format datetime to a string
         format_date = '%Y%m%d'
         format_time = '%H%M'
-        date, time = create_date_and_time(date_time, format_date, format_time)
-        req = self._instance.tfnsw_trip_request2(
-            JSONFORMAT, COORDINATEFORMAT, dep, date, time, *departure,
-            *destination, tf_nswtr="true", calc_number_of_trips=calc_number_of_trips, version=self.version)
-        self.result = req
-        self.error = req.error
+        date_str, time = create_date_and_time(date_time, format_date, format_time)
+        try:
+            req = self._instance.tfnsw_trip_request2(
+                JSONFORMAT, COORDINATEFORMAT, dep, date_str, time, *departure,
+                *destination, tf_nswtr="true", calc_number_of_trips=calc_number_of_trips, version=self.version)
+            self.error = 404 if req.journeys is None else 200
+            return req
+        except ApiException as err:
+            sys.exit(err)
 
     def request_status_info(self, *params):
         """
-        find detailed status reports on potential, trainworks,
+        find detailed status reports on potential, train works,
         delays for specified stops. Not implemented
         """
-

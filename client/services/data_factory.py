@@ -1,64 +1,78 @@
 """
 handles yielding/returning meaningful data to client by
-filtering through data like stop information, departures and journey info
+filtering/mapping through data like stop information, departures and journey info
 and converting data types
 such as dates, etc
 """
+
 from datetime import datetime
 from dateutil import tz
 from swagger_client.models import (
-    DepartureMonitorResponse
+    DepartureMonitorResponse, StopFinderLocation, TripRequestResponseJourney,
+    TripRequestResponseJourneyLeg
 )
+from typing import Sequence
+
 from client.services.app_locals import VALID_TRANSPORT
 from client.models.departure_info import DepartureInfo
+from client.models.trip_journey import TripJourney
 
-def generator_stop_information(client, selected_types, query):
+
+def generator_stop_information(
+        locations: Sequence[StopFinderLocation],
+        selected_types: Sequence[int], query: str, is_suburb=False
+) -> Sequence[tuple]:
     """
     get stop information
     """
-
-    locations = client.result.locations
+    print(selected_types)
     for location in locations:
+        location.modes = location.modes if location.modes is not None else []
+        if selected_types:
+            if not any(selected_type in location.modes for selected_type in selected_types):
+                continue
+            else:
+                print(location.modes)
+        if is_suburb:
+            if location.name.split(' ')[-1] != query.capitalize():
+                continue
+        yield location.id, location.name
 
-        if not location.modes:
-            continue
-        if not location.parent.name == query.capitalize():
-            continue
-        if not selected_types or\
-            selected_types in location.modes:
-            yield location.id, location.name
 
 
-def date_parser(departure_time: str, time_format="%Y-%m-%dT%H:%M:%SZ"):
+
+def date_parser(
+        departure_time: str, time_format="%Y-%m-%dT%H:%M:%SZ"
+) -> datetime:
     """
     parses a date string using the specified date_time_format
     and converts it to Australian Time localtime
-        \nArgs:
-            \n`departure_time`: str -> time of departure in string format, implied UTC format
-            \n`time_format`: str -> format to aid in parsing string to datetime
+        args:
+            `departure_time`: str -> time of departure in string format, implied UTC format
+            `time_format`: str -> format to aid in parsing string to datetime
+        :rtype: datetime
     """
     # Specify Timezone to convert to and from ie UTC -> Sydney localtime
-    # this pulls localtime information from /usr/share/zoninfo (linux sys)
+    # this pulls localtime information from `/usr/share/zoneinfo` (linux sys)
     # this includes daylight savings info eg. AEST-10AEDT,M10.1.0,M4.1.0/3
     from_zone = tz.gettz('UTC')
     to_zone = tz.gettz('Australia/Sydney')
     # replace will specify the date format to convert from (UTC)
-    # and astimezone will convert it to specified timezone eg. Australian EST
+    # and `as times zone` will convert it to specified timezone eg. Australian EST
     parsed_date = datetime.strptime(
         departure_time, time_format
     ).replace(tzinfo=from_zone).astimezone(to_zone)
-
 
     return parsed_date
 
 
 def generator_departure_info(
         events: DepartureMonitorResponse
-) -> (int, int, int, str, str):
+) -> Sequence[DepartureInfo]:
     """## Generate departure information for a stop
     \nArgs:
         \n- `events`: `DepartureMonitorResponse` -> stop events for a specified location
-        \n- `of_type`: str -> specifieed stop type ID to filter. as defined in the API docs
+        \n- `of_type`: str -> specified stop type ID to filter. as defined in the API docs
     \nyields:
         \n- `hours`: int,
         \n- `minutes`: int,
@@ -67,6 +81,8 @@ def generator_departure_info(
         \n- `dest`: str,
         \n- `location`: str
     """
+    if events.stop_events is None:
+        return False
     for event in events.stop_events:
         transport_type = event.transportation.product.icon_id
         transportation = event.transportation
@@ -87,17 +103,16 @@ def generator_departure_info(
         # in order to calculate the hours, mins and secs, we must
         # divide the total seconds to produce total hours and divide the
         # remainder to find minutes and seconds
-
         # will return division result + remainder
         hours, remainder = divmod(countdown.seconds, 3600)
-        # devide remainder by 60 remainder which will be seconds
+        # decide remainder by 60 remainder which will be seconds
         minutes, seconds = divmod(remainder, 60)
         yield DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
 
 
 def create_date_and_time(
         date: datetime, format_date: str, format_time: str
-):
+) -> (str, str):
     """
     returns a tuple of strings containing a formatted
     date and time strings, taking in a datetime object
@@ -112,17 +127,14 @@ def create_date_and_time(
     time = datetime.strftime(date, format_time)
     return today, time
 
-def generator_stop_info(stops, _type):
-    """
-    """
-    for stop in stops:
-        pass
 
-def generator_trip_data(journeys) -> (float, float, list, tuple, tuple, dict):
+def generator_trip_data(
+        journeys: Sequence[TripRequestResponseJourney]
+) -> Sequence[TripJourney]:
     """
     yields trip information from journeys:
         \nArgs:
-            \njourneys: list -> list of journeys, recieved from the API Call\n
+            \njourneys: list -> list of journeys, received from the API Call\n
         \nYields:
             \ntotal_fare: float -> cost of journey,
             \ntotal_duration: float -> duration (in minutes) of journey,
@@ -132,7 +144,9 @@ def generator_trip_data(journeys) -> (float, float, list, tuple, tuple, dict):
             \nstops: dict -> all stops in journey
     """
 
-    def get_stop_info(stops, legs):
+    def get_stop_info(
+            stops_info: dict, legs_data: Sequence[TripRequestResponseJourneyLeg]
+    ):
         """
         modifies existing dictionary and appends
         new stopping information for each 'leg' in a journey
@@ -140,15 +154,18 @@ def generator_trip_data(journeys) -> (float, float, list, tuple, tuple, dict):
                 \n`stops`: dict -> containing information about stops,
                 \n`legs`: JourneyLegs -> all legs in a journey. ie. transport and network changes,
         """
-        for leg in legs:
+        type_ = ''
+        for leg in legs_data:
+            if leg.stop_sequence is None:
+                continue
             for seq_num, sequence in enumerate(leg.stop_sequence):
                 if seq_num == 0:
                     # create new key entry for each leg/ network change in journey
                     type_ = (
                         leg.transportation.name
-                        if leg.transportation.name is not None else 'walk' # trip is walk if None
+                        if leg.transportation.name is not None else 'walk'  # trip is walk if None
                     )
-                    stops[type_] = []
+                    stops_info[type_] = []
 
                 # attempt to get live updates/ estimated otherwise get planned dep/arrival times
                 if sequence.departure_time_estimated is not None:
@@ -165,11 +182,11 @@ def generator_trip_data(journeys) -> (float, float, list, tuple, tuple, dict):
                 if departure != 'Unavailable':
                     # parse dates and return the formatted time string
                     _, departure = create_date_and_time(departure, '', '%H:%M')
-                stops[type_].append(f'{sequence.name} arrives: {departure}')
+                stops_info[type_].append(f'{sequence.name} arrives: {departure}')
+
     # end of function
 
     for journey in journeys:
-
         legs = journey.legs
         fares = journey.fare.tickets
 
@@ -194,8 +211,7 @@ def generator_trip_data(journeys) -> (float, float, list, tuple, tuple, dict):
         stops = {}
         get_stop_info(stops, legs)
 
-        yield (
+        yield TripJourney(
             total_fare, total_duration, summary, depart_day, depart_time,
             arrive_day, arrive_time, stops
         )
-

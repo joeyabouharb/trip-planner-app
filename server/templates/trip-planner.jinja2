@@ -1,0 +1,38 @@
+{% extends "layout.jinja2" %}
+{% block title %} Trip Planner {% endblock %}
+    {% block content %}
+        <section>
+        <h2>Plan a Trip:</h2>
+            <form method="GET" action="/trip-planner">
+                <label> Origin: <input name="origin" type="search" placeholder="Enter Origin Stop"/></label>
+                <label> Suburb <input name="origin_suburb" type="checkbox"  value="1"/></label>
+                <label> Destination: <input name="destination" placeholder="Enter Destination Stop" type="search"/></label>
+                <label> Suburb <input name="dest_suburb" type="checkbox"  value="1"/></label>
+                <button type="submit">Search</button>
+            </form>
+        </section>
+        <section>
+            <h3>Results: </h3>
+            <div>
+                {% if destinations and origins %}
+                    <form method="GET" action="/journeys">
+                            <label>Origins: <select name="origin">
+                                {% for id, name in origins %}
+                                <option value="{{ id }}">{{ name }}</option>
+                                {% endfor %}
+                            </select></label>
+                        <label>Destinations:
+                            <select name="dest">
+                        {% for id, name in destinations %}
+                                <option value="{{ id }}">{{ name }}</option>
+                        {% endfor %}
+                            </select>
+                            </label>
+                    <button type="submit"> Select route </button>
+                    </form>
+                {% else %}
+                    <p>No results</p>
+                {% endif %}
+            </div>
+        </section>
+{% endblock %}

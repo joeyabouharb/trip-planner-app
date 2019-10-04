@@ -1,4 +1,4 @@
-#!/home/joey/Documents/trip-planner-assessment/env/bin/python3
+#!/home/joey/Documents/trip-planner-assessment/venv/bin/python3.7
 # -*- coding: utf-8 -*-
 import re
 import sys

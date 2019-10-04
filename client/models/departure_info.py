@@ -2,7 +2,8 @@
 class model for departure information for a particular stop
 """
 
-class DepartureInfo():
+
+class DepartureInfo:
     """
     contains the information about departure information such as:
         \nProps:
@@ -32,10 +33,8 @@ class DepartureInfo():
             f'seconds from {self.location}\n {self.route} to {self.dest}'
         )
 
-
     def to_dict(self) -> dict:
         """
         returns class properties as dict, reserved for api usage
         """
         return self.__dict__
-

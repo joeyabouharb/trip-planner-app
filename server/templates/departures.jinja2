@@ -1,9 +1,12 @@
-{% extends "layout.html" %}
+{% extends "layout.jinja2" %}
     {% block title %} Departures {% endblock %}
     {% block content %}
         <section>
             <h2>Departures:</h2>
-            <div>
+            {% if not departures_info %}
+                <p>No Services are currently available at this stop</p>
+            {% endif %}
+            <ul>
             {% for departure in departures_info %}
             {% set hours, minutes, seconds = departure.time_to_arrive %}
                 <section>
