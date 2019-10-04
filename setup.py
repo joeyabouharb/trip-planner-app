@@ -27,7 +27,7 @@ INSTALL_REQUIRES = [
     "wrapt"
 ]
 DEPENDENCY_LINKS = [
-    "https://github.com/joeyabouharb/opendata-swagger/archive/master.zip"
+    "https://github.com/joeyabouharb/opendata-swagger/raw/master/dist/swagger_client-1.0.0-py3.7.egg"
 ]
 LONG_DESC = """\
     This application handles communication between
