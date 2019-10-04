@@ -1,4 +1,3 @@
-
 """
 Flask server app
 Initialises Flask Server with routes to:
@@ -8,16 +7,16 @@ Initialises Flask Server with routes to:
     - /trip-planner
 """
 
+from operator import attrgetter
+
 from flask import (
     Flask, render_template, request
 )
-from client.client_class import Client
-from client.services.data_factory import (
+from flask_server.client_class import Client
+from flask_server.services.app_locals import VALID_TRANSPORT
+from flask_server.services.data_factory import (
     generator_departure_info, generator_stop_information, generator_trip_data
 )
-from client.services.app_locals import VALID_TRANSPORT
-from operator import attrgetter
-
 
 app = Flask(__name__)
 CLIENT = Client()
@@ -76,6 +75,10 @@ def get_stop_information():
 
 @app.route('/journeys')
 def get_trip_info():
+    """
+
+    :return:
+    """
     type_origin, origin = (
         request.args.get('originType', 'any'),
         request.args.get('origin', '')
@@ -93,9 +96,12 @@ def get_trip_info():
         )
 
     trips = CLIENT.find_trips_for_stop(
-        type_origin, origin, type_dest, destination, dep
+        (type_origin, origin), (type_dest, destination), dep
     )
-    origin_name = CLIENT.find_stops_by_name('stop', origin[1])
+
+    origin_name = CLIENT.find_stops_by_name(
+        'stop', origin[1]
+    )
 
     if CLIENT.error == 404:
         return f"{CLIENT.error}"

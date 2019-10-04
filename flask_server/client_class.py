@@ -6,18 +6,19 @@ the server. Caching Class
 
 import sys
 from datetime import datetime
+
 from dateutil import tz
-from swagger_client.rest import ApiException
 from swagger_client.models.departure_monitor_response import DepartureMonitorResponse
 from swagger_client.models.stop_finder_response import StopFinderResponse
 from swagger_client.models.trip_request_response import TripRequestResponse
-import client.services.swagger_instance as instance
-from client.config.environment import JSONFORMAT, COORDINATEFORMAT
-from client.models.departure_info import DepartureInfo
-from client.services.data_factory import (
-    generator_departure_info, create_date_and_time, generator_trip_data
+from swagger_client.rest import ApiException
+
+import flask_server.services.swagger_instance as instance
+from flask_server.config.environment import JSONFORMAT, COORDINATEFORMAT
+from flask_server.services.app_locals import VALID_EXCLUSIONS
+from flask_server.services.data_factory import (
+    create_date_and_time
 )
-from client.services.app_locals import VALID_EXCLUSIONS
 
 
 class Client:

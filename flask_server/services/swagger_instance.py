@@ -4,7 +4,8 @@ responsible for setting up swagger instance
 
 from swagger_client.api import TripPlannerApi
 from swagger_client.api_client import ApiClient
-from client.config.config import configure_swagger
+
+from flask_server.config.config import configure_swagger
 
 
 def start() -> TripPlannerApi:

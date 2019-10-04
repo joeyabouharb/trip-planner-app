@@ -84,7 +84,7 @@ target/
 # pyenv
 .python-version
 env/
-client/config/environment.py
+server/config/environment.py
 *.egg-info/
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.

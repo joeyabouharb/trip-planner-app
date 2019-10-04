@@ -4,12 +4,13 @@ set up your api as per instruction in the README
 """
 
 
-from client.config.environment import API_KEY
 from swagger_client import Configuration
+
+from flask_server.config.environment import API_KEY
 
 
 def configure_swagger()\
--> (Configuration):
+-> Configuration:
     """
     returns a configured swagger, with APIKEY set
     """

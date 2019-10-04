@@ -6,16 +6,17 @@ such as dates, etc
 """
 
 from datetime import datetime
+from typing import Sequence
+
 from dateutil import tz
 from swagger_client.models import (
     DepartureMonitorResponse, StopFinderLocation, TripRequestResponseJourney,
     TripRequestResponseJourneyLeg
 )
-from typing import Sequence
 
-from client.services.app_locals import VALID_TRANSPORT
-from client.models.departure_info import DepartureInfo
-from client.models.trip_journey import TripJourney
+from flask_server.models.departure_info import DepartureInfo
+from flask_server.models.trip_journey import TripJourney
+from flask_server.services.app_locals import VALID_TRANSPORT
 
 
 def generator_stop_information(
