@@ -49,7 +49,7 @@ setup(
     author_email=EMAIL,
     url=URL,
     keywords=KEYWORDS,
-    packages=find_packages(exclude='*.egg-info'),
+    packages=find_packages(),
     include_package_data=True,
     long_description=LONG_DESC,
     dependency_links=DEPENDENCY_LINKS,
