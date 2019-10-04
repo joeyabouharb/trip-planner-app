@@ -107,8 +107,8 @@ def get_trip_info():
 
     origin_name = next(
         generator_stop_information(
-        origin_name.locations, [], ''), False
-    )
+            origin_name.locations, [], ''), False
+        )
     if CLIENT.error == 404:
         return f"{CLIENT.error}"
 
