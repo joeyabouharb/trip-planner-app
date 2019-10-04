@@ -28,7 +28,7 @@ INSTALL_REQUIRES = [
 ]
 DEPENDENCY_LINKS = [
     "https://github.com/joeyabouharb/trip-planner-app.git@f349e18e32c64f5e1c1a57a0b83ec05f8e3c2fc3#egg=trip_planner",
-    "https://github.com/joeyabouharb/opendata-swagger.git"
+    "git+https://github.com/joeyabouharb/opendata-swagger.git"
 ]
 LONG_DESC = """\
     This application handles communication between
