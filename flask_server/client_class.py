@@ -59,7 +59,7 @@ class Client:
         """
 
     def find_destinations_for(
-            self, _type: str, query: str, transport_types: list,
+            self, http://127.0.0.1:5000/ _type: str, query: str, transport_types: list,
             date_time=datetime.today()
     ) -> DepartureMonitorResponse:
         """### find destinations for specific stop/location

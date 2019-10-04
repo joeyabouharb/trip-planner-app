@@ -63,7 +63,6 @@ def get_stop_information():
         for key in VALID_TRANSPORT.keys() if int(request.args.get(str(key), False))
     ]
     valid_transports = list(VALID_TRANSPORT.values())
-    print(selections)
     locations = stops.locations
 
     data = generator_stop_information(locations, selections, req, is_suburb) if req else []
@@ -159,7 +158,7 @@ def plan_trip():
             render_template(
                 "trip-planner.jinja2", origins=[], destinations=[], err=404
             )
-        print(origin_is_suburb)
+
         origins = generator_stop_information(
             origins.locations, [], origin_stop, origin_is_suburb
         )
