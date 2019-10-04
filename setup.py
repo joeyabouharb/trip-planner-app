@@ -25,7 +25,7 @@ INSTALL_REQUIRES = [
     "urllib3",
     "Werkzeug",
     "wrapt",
-    "swagger-client @ https://github.com/joeyabouharb/opendata-swagger",
+    "swagger-client @ https://github.com/joeyabouharb/opendata-swagger/archive/zip",
     "python-dateutil"
 ]
 
