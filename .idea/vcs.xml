@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.circleci/venv/src/trip-planner" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/trip-planner-flask" vcs="Git" />
   </component>
 </project>
