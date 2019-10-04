@@ -9,8 +9,7 @@ from swagger_client import Configuration
 from flask_server.config.environment import API_KEY
 
 
-def configure_swagger()\
--> Configuration:
+def configure_swagger() -> Configuration:
     """
     returns a configured swagger, with APIKEY set
     """

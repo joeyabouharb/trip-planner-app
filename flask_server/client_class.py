@@ -14,8 +14,9 @@ from swagger_client.models.trip_request_response import TripRequestResponse
 from swagger_client.rest import ApiException
 
 import flask_server.services.swagger_instance as instance
-from flask_server.config.environment import JSONFORMAT, COORDINATEFORMAT
-from flask_server.services.app_locals import VALID_EXCLUSIONS
+from flask_server.services.app_locals import (
+    VALID_EXCLUSIONS, JSON_FORMAT, COORDINATE_FORMAT
+)
 from flask_server.services.data_factory import (
     create_date_and_time
 )
@@ -36,7 +37,9 @@ class Client:
         self.error = None
         self.version = '10.2.1.42'  # stable version
 
-    def find_stops_by_name(self, _type: str, query: str, is_id=False) -> StopFinderResponse:
+    def find_stops_by_name(
+            self, _type: str, query: str, is_id=False
+    ) -> StopFinderResponse:
         """### Find Stop by name
         \nfind a stop from a specified POI, or suburb
         \nArgs:
@@ -44,10 +47,11 @@ class Client:
             `any`, `stop`, `platform`, etc.
             \nquery: search query, usually a stop ID or a name type: (str)
         """
+        # if search based on trip_id. returns the best match on true
         tf_nswsf = "true" if is_id else ""
         try:
             req = self._instance.tfnsw_stopfinder_request(
-                JSONFORMAT, _type, query, COORDINATEFORMAT, version=self.version, tf_nswsf=tf_nswsf
+                JSON_FORMAT, _type, query, COORDINATE_FORMAT, version=self.version, tf_nswsf=tf_nswsf
             )
             self.error = 404 if req is None else 200
             return req
@@ -91,13 +95,13 @@ class Client:
             if isinstance(exclusions, dict):
 
                 req = self._instance.tfnsw_dm_request(
-                    JSONFORMAT, COORDINATEFORMAT, _type, query,
+                    JSON_FORMAT, COORDINATE_FORMAT, _type, query,
                     'dep', date_str, time, exclusions=exclusions, mode='direct',
                     tf_nswdm="true", exclude_means='checkbox', version=self.version
                 )
             else:  # otherwise search normally, or just exclude one option
                 req = self._instance.tfnsw_dm_request(
-                    JSONFORMAT, COORDINATEFORMAT, _type, query,
+                    JSON_FORMAT, COORDINATE_FORMAT, _type, query,
                     'dep', date_str, time,
                     mode='direct', tf_nswdm="true", exclude_means=exclusions, version=self.version
                 )
@@ -142,7 +146,7 @@ class Client:
         date_str, time = create_date_and_time(date_time, format_date, format_time)
         try:
             req = self._instance.tfnsw_trip_request2(
-                JSONFORMAT, COORDINATEFORMAT, dep, date_str, time, *departure,
+                JSON_FORMAT, COORDINATE_FORMAT, dep, date_str, time, *departure,
                 *destination, tf_nswtr="true", calc_number_of_trips=calc_number_of_trips, version=self.version)
             self.error = 404 if req.journeys is None else 200
             return req

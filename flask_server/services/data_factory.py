@@ -1,10 +1,10 @@
+
 """
 handles yielding/returning meaningful data to client by
 filtering/mapping through data like stop information, departures and journey info
 and converting data types
 such as dates, etc
 """
-
 from datetime import datetime
 from typing import Sequence
 
@@ -13,7 +13,6 @@ from swagger_client.models import (
     DepartureMonitorResponse, StopFinderLocation, TripRequestResponseJourney,
     TripRequestResponseJourneyLeg
 )
-
 from flask_server.models.departure_info import DepartureInfo
 from flask_server.models.trip_journey import TripJourney
 from flask_server.services.app_locals import VALID_TRANSPORT
@@ -26,7 +25,7 @@ def generator_stop_information(
     """
     get stop information
     """
-    print(selected_types)
+
     for location in locations:
         location.modes = location.modes if location.modes is not None else []
         if selected_types:
@@ -38,8 +37,6 @@ def generator_stop_information(
             if location.name.split(' ')[-1] != query.capitalize():
                 continue
         yield location.id, location.name
-
-
 
 
 def date_parser(
