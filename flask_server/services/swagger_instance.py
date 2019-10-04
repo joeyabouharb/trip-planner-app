@@ -10,7 +10,7 @@ from flask_server.config.config import configure_swagger
 
 def start() -> TripPlannerApi:
     """
-    start a swagger instance
+    start a swagger instance cool
     """
     config = configure_swagger()
     client = ApiClient(config)
