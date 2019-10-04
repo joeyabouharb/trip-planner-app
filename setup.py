@@ -24,8 +24,7 @@ INSTALL_REQUIRES = [
     "typed-ast",
     "urllib3",
     "Werkzeug",
-    "wrapt",
-    "swagger-client @ https://github.com/joeyabouharb/opendata-swagger"
+    "wrapt"
 ]
 DEPENDENCY_LINKS = [
     "https://github.com/joeyabouharb/opendata-swagger/tarball/master#egg=swagger-client-1.0.0",
