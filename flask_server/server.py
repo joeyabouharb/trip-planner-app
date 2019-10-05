@@ -16,7 +16,7 @@ from flask import (
 from flask_server.client_class import Client
 from flask_server.services.app_locals import VALID_TRANSPORT
 from flask_server.services.data_factory import (
-    generator_departure_info, generator_stop_information, generator_trip_data
+    create_departure_info, generator_stop_information, generator_trip_data
 )
 
 load_dotenv(find_dotenv())
@@ -48,10 +48,8 @@ def get_departures(id_: str):
     departures = CLIENT.find_destinations_for(
         'any', id_, expected_type
     )
-    departures_info = generator_departure_info(departures)
-    sorted_departures = sorted(departures_info, key=attrgetter('location'))
-    print(sorted_departures)
-    return render_template("departures.jinja2", departures_info=sorted_departures)
+    departures_info = create_departure_info(departures)
+    return render_template("departures.jinja2", departures_info=departures_info)
 
 
 @app.route('/stops')

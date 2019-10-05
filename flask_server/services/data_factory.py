@@ -7,8 +7,9 @@ such as dates, etc
 """
 from datetime import datetime
 from typing import Sequence
-
+from operator import attrgetter
 from dateutil import tz
+
 from swagger_client.models import (
     DepartureMonitorResponse, StopFinderLocation, TripRequestResponseJourney,
     TripRequestResponseJourneyLeg
@@ -69,7 +70,7 @@ def date_parser(
     return parsed_date
 
 
-def generator_departure_info(
+def create_departure_info(
         events: DepartureMonitorResponse
 ) -> Sequence[DepartureInfo]:
     """## Generate departure information for a stop
@@ -84,9 +85,10 @@ def generator_departure_info(
         \n- `dest`: str,
         \n- `location`: str
     """
-    print(events)
+
     if events.stop_events is None:
         return False
+    departure_info = []
     for event in events.stop_events:
         transport_type = event.transportation.product.icon_id
         transportation = event.transportation
@@ -113,9 +115,10 @@ def generator_departure_info(
         minutes, seconds = divmod(remainder, 60)
         print(location)
 
-        bla = DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
-        print(bla.location)
-        yield bla
+        departure_info.append(DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_))
+    departure_info.sort(key=attrgetter("location"))
+    return departure_info
+
 
 def create_date_and_time(
         date: datetime, format_date: str, format_time: str
