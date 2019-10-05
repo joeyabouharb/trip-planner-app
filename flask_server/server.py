@@ -44,7 +44,7 @@ def get_departures(id_: str):
     """
     get departures for a certain stop ID
     """
-    expected_type = request.args.get('expected_type')
+    expected_type = request.args.get('expected_type', 'dep')
     departures = CLIENT.find_destinations_for(
         'any', id_, expected_type
     )

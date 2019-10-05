@@ -81,8 +81,8 @@ class Client:
         # sends a request to the api using the swagger instance
         try:
             req = self._instance.tfnsw_dm_request(
-                JSON_FORMAT, COORDINATE_FORMAT, _type, query, request_type,
-                date_str, time,
+                JSON_FORMAT, COORDINATE_FORMAT, _type, query,
+                request_type, date_str, time,
                 mode='direct', tf_nswdm="true", version=self.version
             )
         except ApiException as err:
