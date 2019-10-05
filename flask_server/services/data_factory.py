@@ -7,12 +7,10 @@ such as dates, etc
 """
 from datetime import datetime
 from typing import Sequence
-from operator import attrgetter
-from dateutil import tz
 
+from dateutil import tz
 from swagger_client.models import (
-    DepartureMonitorResponse, StopFinderLocation, TripRequestResponseJourney,
-    TripRequestResponseJourneyLeg
+    DepartureMonitorResponse, StopFinderLocation, TripRequestResponseJourney
 )
 from flask_server.models.departure_info import DepartureInfo
 from flask_server.models.trip_journey import TripJourney
@@ -70,7 +68,7 @@ def date_parser(
     return parsed_date
 
 
-def create_departure_info(
+def generator_departure_info(
         events: DepartureMonitorResponse
 ) -> Sequence[DepartureInfo]:
     """## Generate departure information for a stop
@@ -88,7 +86,6 @@ def create_departure_info(
 
     if events.stop_events is None:
         return False
-    departure_info = []
     for event in events.stop_events:
         transport_type = event.transportation.product.icon_id
         transportation = event.transportation
@@ -99,6 +96,7 @@ def create_departure_info(
         type_ = VALID_TRANSPORT[transport_type]
         departure_time = event.departure_time_planned
         parsed_date = date_parser(departure_time)
+
         # ensure datetime is formatted with timezone info
         today = datetime.now(tz=tz.gettz('Australia/Sydney'))
         countdown = parsed_date - today
@@ -106,6 +104,7 @@ def create_departure_info(
         # if the train has already passed skip to next data set
         if countdown.total_seconds() < 0:
             continue
+
         # in order to calculate the hours, mins and secs, we must
         # divide the total seconds to produce total hours and divide the
         # remainder to find minutes and seconds
@@ -113,12 +112,8 @@ def create_departure_info(
         hours, remainder = divmod(countdown.seconds, 3600)
         # decide remainder by 60 remainder which will be seconds
         minutes, seconds = divmod(remainder, 60)
-        departure = DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
-        print(departure)
-        departure_info.append(departure)
-    departure_info.sort(key=attrgetter("location"))
-    print(departure_info)
-    return departure_info
+
+        yield DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
 
 
 def create_date_and_time(
