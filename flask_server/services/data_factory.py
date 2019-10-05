@@ -84,6 +84,7 @@ def generator_departure_info(
         \n- `dest`: str,
         \n- `location`: str
     """
+    print(events)
     if events.stop_events is None:
         return False
     for event in events.stop_events:
@@ -110,6 +111,7 @@ def generator_departure_info(
         hours, remainder = divmod(countdown.seconds, 3600)
         # decide remainder by 60 remainder which will be seconds
         minutes, seconds = divmod(remainder, 60)
+        print(location)
         yield DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
 
 
