@@ -31,8 +31,8 @@ class Client:
     \n- `error`: int -> http error code / msg
     """
 
-    def __init__(self):
-        self._instance = instance.start()
+    def __init__(self, key):
+        self._instance = instance.start(key)
         self.result = None
         self.error = None
         self.version = '10.2.1.42'  # stable version

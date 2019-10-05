@@ -27,15 +27,20 @@ def generator_stop_information(
     """
 
     for location in locations:
-        location.modes = location.modes if location.modes is not None else []
+        # get available transport modes ie, train, bus etc.
+        location.modes = (
+            location.modes if location.modes is not None else []
+        )  # avoid errors by returning an empty array if no modes are found
+
+        # if a transport type was specified filter and return types
         if selected_types:
             if not any(selected_type in location.modes for selected_type in selected_types):
                 continue
-            else:
-                print(location.modes)
+        # search by suburb if selected
         if is_suburb:
             if location.name.split(' ')[-1] != query.capitalize():
                 continue
+
         yield location.id, location.name
 
 
@@ -142,9 +147,7 @@ def generator_trip_data(
             \nstops: dict -> all stops in journey
     """
 
-    def get_stop_info(
-            stops_info: dict, legs_data: Sequence[TripRequestResponseJourneyLeg]
-    ):
+    def get_stop_info():
         """
         modifies existing dictionary and appends
         new stopping information for each 'leg' in a journey
@@ -153,7 +156,7 @@ def generator_trip_data(
                 \n`legs`: JourneyLegs -> all legs in a journey. ie. transport and network changes,
         """
         type_ = ''
-        for leg in legs_data:
+        for leg in legs:
             if leg.stop_sequence is None:
                 continue
             for seq_num, sequence in enumerate(leg.stop_sequence):
@@ -163,25 +166,24 @@ def generator_trip_data(
                         leg.transportation.name
                         if leg.transportation.name is not None else 'walk'  # trip is walk if None
                     )
-                    stops_info[type_] = []
+                    stops[type_] = []
 
                 # attempt to get live updates/ estimated otherwise get planned dep/arrival times
                 if sequence.departure_time_estimated is not None:
-                    departure = date_parser(sequence.departure_time_estimated)
+                    departure_time = date_parser(sequence.departure_time_estimated)
                 elif sequence.arrival_time_estimated is not None:
-                    departure = date_parser(sequence.arrival_time_estimated)
+                    departure_time = date_parser(sequence.arrival_time_estimated)
                 elif sequence.departure_time_planned is not None:
-                    departure = date_parser(sequence.departure_time_planned)
+                    departure_time = date_parser(sequence.departure_time_planned)
                 elif sequence.arrival_time_planned is not None:
-                    departure = date_parser(sequence.arrival_time_planned)
+                    departure_time = date_parser(sequence.arrival_time_planned)
                 else:
                     # if no information is available output message:
-                    departure = 'Unavailable'
-                if departure != 'Unavailable':
-                    # parse dates and return the formatted time string
-                    _, departure = create_date_and_time(departure, '', '%H:%M')
-                stops_info[type_].append(f'{sequence.name} arrives: {departure}')
-
+                    departure_time = 'Unavailable'
+                if departure_time != 'Unavailable':
+                    # parse dates and return the formatted time string only
+                    _, departure_time = create_date_and_time(departure_time, '', '%H:%M')
+                stops[type_].append(f'{sequence.name} arrives: {departure_time}')
     # end of function
 
     for journey in journeys:
@@ -191,7 +193,9 @@ def generator_trip_data(
         total_fare = sum(
             float(fare.properties.price_total_fare)
             for fare in fares if fare.person == 'SCHOLAR'
-        )
+        )  # Sum of fare
+
+        # calculate total duration in minutes and round up 2 decimal places
         total_duration = sum(leg.duration for leg in legs) / 60
         total_duration = round(total_duration, 2)
 
@@ -207,7 +211,7 @@ def generator_trip_data(
         arrive_day, arrive_time = create_date_and_time(arrive, '%A,  %d-%m-%Y', '%H:%M%Z')
 
         stops = {}
-        get_stop_info(stops, legs)
+        get_stop_info()  # append list of stops in legs to stops dict
 
         yield TripJourney(
             total_fare, total_duration, summary, depart_day, depart_time,

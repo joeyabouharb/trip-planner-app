@@ -7,7 +7,7 @@ Initialises Flask Server with routes to:
     - /trip-planner
 """
 
-
+from os import environ
 from operator import attrgetter
 
 from flask import (
@@ -20,7 +20,9 @@ from flask_server.services.data_factory import (
 )
 
 app = Flask(__name__)
-CLIENT = Client()
+app.config.from_envvar('CONFIG')
+TRIP_API_KEY = environ.get('TRIP_PLANNER_API_KEY')
+CLIENT = Client(TRIP_API_KEY)
 
 
 # get request to get status info? homepage extension
@@ -53,8 +55,10 @@ def get_departures(id_: str):
 @app.route('/stops')
 def get_stop_information():
     """
+    :route: /stops
+    returns a list of stops from entered key words
+    :return:
     """
-
     req = request.args.get('query', False)
     stops = CLIENT.find_stops_by_name('any', req)
     is_suburb = bool(request.args.get('suburb', False))
@@ -62,28 +66,33 @@ def get_stop_information():
         int(request.args.get(str(key), False))
         for key in VALID_TRANSPORT.keys() if int(request.args.get(str(key), False))
     ]
-    valid_transports = list(VALID_TRANSPORT.values())
+
     locations = stops.locations
-
-    data = generator_stop_information(locations, selections, req, is_suburb) if req else []
-
+    data = (
+        generator_stop_information(locations, selections, req, is_suburb)
+        if req else []
+    )  # return an empty list if no location was returned
     return render_template(
-        'stops.jinja2', data=data, selected_type=selections,
-        type="+".join(valid_transports), valid_transports=VALID_TRANSPORT
+        'stops.jinja2', data=data, selected_type=selections
     )
 
 
 @app.route('/journeys')
 def get_trip_info():
     """
-
+    :route: /journeys
+    returns a list of journeys for a specified trip
     :return:
     """
     type_origin, origin = (
         request.args.get('originType', 'any'),
         request.args.get('origin', '')
     )
-    type_dest, destination = request.args.get('destType', 'any'), request.args.get('dest', '')
+    type_dest, destination = (
+        request.args.get('destType', 'any'),
+        request.args.get('dest', '')
+    )
+
     dep = request.args.get('dep', 'dep')
 
     if not origin:

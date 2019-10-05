@@ -4,15 +4,24 @@ responsible for setting up swagger instance
 
 from swagger_client.api import TripPlannerApi
 from swagger_client.api_client import ApiClient
+from swagger_client import Configuration
 
-from flask_server.config.config import configure_swagger
 
-
-def start() -> TripPlannerApi:
+def start(api_key) -> TripPlannerApi:
     """
-    start a swagger instance cool
+    start an instance of the trip planner api
+    :param api_key:
+    :return: TripPlannerApi
     """
+    def configure_swagger() -> Configuration:
+        """
+        configure swagger with an API KEY
+        :return: Configuration
+        """
+        conf = Configuration()
+        conf.access_token = api_key
+        return conf
+
     config = configure_swagger()
     client = ApiClient(config)
     return TripPlannerApi(client)
-
