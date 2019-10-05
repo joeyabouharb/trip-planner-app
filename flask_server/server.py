@@ -23,7 +23,9 @@ load_dotenv(find_dotenv())
 
 app = Flask(__name__)
 app.config.from_envvar('CONFIG')
-TRIP_API_KEY = app.config.get('TRIP_PLANNER_API_KEY')
+TRIP_API_KEY = app.config.get('TRIP_PLANNER_API_KEY', False)
+if not TRIP_API_KEY:
+    TRIP_API_KEY = environ.get('TRIP_PLANNER_API_KEY')
 
 CLIENT = Client(TRIP_API_KEY)
 
