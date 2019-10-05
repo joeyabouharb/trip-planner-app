@@ -50,11 +50,11 @@ def get_departures(id_: str):
     departures = CLIENT.find_destinations_for(
         'any', id_, transport_types=transport_types
     )
+    departures_info = generator_departure_info(departures)
 
-    departures_info = list(generator_departure_info(departures))
-
-    departures_info.sort(key=attrgetter('location'))
-    return render_template("departures.jinja2", departures_info=departures_info)
+    sorted_departures = sorted(departures_info, key=attrgetter('location'))
+    print(sorted_departures)
+    return render_template("departures.jinja2", departures_info=sorted_departures)
 
 
 @app.route('/stops')
