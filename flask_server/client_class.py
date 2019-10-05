@@ -63,8 +63,7 @@ class Client:
         """
 
     def find_destinations_for(
-            self, _type: str, query: str, transport_types: list,
-            date_time=datetime.today()
+            self, _type: str, query: str, request_type: str, date_time=datetime.today()
     ) -> DepartureMonitorResponse:
         """### find destinations for specific stop/location
         find destinations for a specified stop taking in
@@ -74,16 +73,6 @@ class Client:
                 usually any or stop, refer to the API docs for more info
                 \n- `query`: str -> station to search, can be key words, suburbs, IDs, etc
         """
-
-        exclusions = {
-            'exclMOT_1': '1', 'exclMOT_4': '1', 'exclMOT_5': '1',
-            'exclMOT_7': '1', 'exclMOT_9': '1', 'exclMOT_11': '1'
-        }
-        for key, value in VALID_EXCLUSIONS.items():
-            if any(transport_type == key for transport_type in transport_types):
-                exclusions.pop(value)
-        if not transport_types[0] and len(transport_types) == 1:
-            exclusions = 0
         # format datetime to a string
         format_date = '%Y%m%d'
         format_time = '%H%M'
@@ -91,20 +80,11 @@ class Client:
         date_str, time = create_date_and_time(date_time, format_date, format_time)
         # sends a request to the api using the swagger instance
         try:
-            # if the user wishes to exclude multiple transport options
-            if isinstance(exclusions, dict):
-
-                req = self._instance.tfnsw_dm_request(
-                    JSON_FORMAT, COORDINATE_FORMAT, _type, query,
-                    'dep', date_str, time, exclusions=exclusions, mode='direct',
-                    tf_nswdm="true", exclude_means='checkbox', version=self.version
-                )
-            else:  # otherwise search normally, or just exclude one option
-                req = self._instance.tfnsw_dm_request(
-                    JSON_FORMAT, COORDINATE_FORMAT, _type, query,
-                    'dep', date_str, time,
-                    mode='direct', tf_nswdm="true", exclude_means=exclusions, version=self.version
-                )
+            req = self._instance.tfnsw_dm_request(
+                JSON_FORMAT, COORDINATE_FORMAT, _type, query, request_type,
+                date_str, time,
+                mode='direct', tf_nswdm="true", version=self.version
+            )
         except ApiException as err:
             sys.exit(err)
 

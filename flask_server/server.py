@@ -44,14 +44,11 @@ def get_departures(id_: str):
     """
     get departures for a certain stop ID
     """
-
-    transport_types = request.args.get('type', '').split(' ')
-
+    expected_type = request.args.get('expected_type')
     departures = CLIENT.find_destinations_for(
-        'any', id_, transport_types=transport_types
+        'any', id_, expected_type
     )
     departures_info = generator_departure_info(departures)
-
     sorted_departures = sorted(departures_info, key=attrgetter('location'))
     print(sorted_departures)
     return render_template("departures.jinja2", departures_info=sorted_departures)
