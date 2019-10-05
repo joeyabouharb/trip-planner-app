@@ -112,8 +112,10 @@ def generator_departure_info(
         # decide remainder by 60 remainder which will be seconds
         minutes, seconds = divmod(remainder, 60)
         print(location)
-        yield DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
 
+        bla = DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
+        print(bla.location)
+        yield bla
 
 def create_date_and_time(
         date: datetime, format_date: str, format_time: str
