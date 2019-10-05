@@ -113,7 +113,6 @@ def create_departure_info(
         hours, remainder = divmod(countdown.seconds, 3600)
         # decide remainder by 60 remainder which will be seconds
         minutes, seconds = divmod(remainder, 60)
-        print(location)
 
         departure_info.append(DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_))
     departure_info.sort(key=attrgetter("location"))
