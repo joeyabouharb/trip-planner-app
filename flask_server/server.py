@@ -9,7 +9,7 @@ Initialises Flask Server with routes to:
 
 from os import environ
 from operator import attrgetter
-
+from dotenv import load_dotenv, find_dotenv
 from flask import (
     Flask, render_template, request
 )
@@ -19,9 +19,12 @@ from flask_server.services.data_factory import (
     generator_departure_info, generator_stop_information, generator_trip_data
 )
 
+load_dotenv(find_dotenv())
+
 app = Flask(__name__)
 app.config.from_envvar('CONFIG')
-TRIP_API_KEY = environ.get('TRIP_PLANNER_API_KEY')
+TRIP_API_KEY = app.config.get('TRIP_PLANNER_API_KEY')
+
 CLIENT = Client(TRIP_API_KEY)
 
 

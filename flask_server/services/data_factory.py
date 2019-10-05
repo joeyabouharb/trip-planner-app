@@ -151,9 +151,6 @@ def generator_trip_data(
         """
         modifies existing dictionary and appends
         new stopping information for each 'leg' in a journey
-            \nArgs:
-                \n`stops`: dict -> containing information about stops,
-                \n`legs`: JourneyLegs -> all legs in a journey. ie. transport and network changes,
         """
         type_ = ''
         for leg in legs:
@@ -209,7 +206,6 @@ def generator_trip_data(
 
         arrive = date_parser(legs[-1].destination.arrival_time_estimated)
         arrive_day, arrive_time = create_date_and_time(arrive, '%A,  %d-%m-%Y', '%H:%M%Z')
-
         stops = {}
         get_stop_info()  # append list of stops in legs to stops dict
 
