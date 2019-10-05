@@ -72,16 +72,10 @@ def generator_departure_info(
         events: DepartureMonitorResponse
 ) -> Sequence[DepartureInfo]:
     """## Generate departure information for a stop
-    \nArgs:
-        \n- `events`: `DepartureMonitorResponse` -> stop events for a specified location
-        \n- `of_type`: str -> specified stop type ID to filter. as defined in the API docs
-    \nyields:
-        \n- `hours`: int,
-        \n- `minutes`: int,
-        \n- `seconds`: int,
-        \n- `route`: str,
-        \n- `dest`: str,
-        \n- `location`: str
+    args
+        :arg: `events`: `DepartureMonitorResponse` -> stop events for a specified location
+        :arg: `of_type`: str -> specified stop type ID to filter. as defined in the API docs
+    yields: DepartureInfo
     """
 
     if events.stop_events is None:
@@ -105,7 +99,7 @@ def generator_departure_info(
         if countdown.total_seconds() < 0:
             continue
 
-        # in order to calculate the hours, mins and secs, we must
+        # in order to calculate the hours, minutes and secs, we must
         # divide the total seconds to produce total hours and divide the
         # remainder to find minutes and seconds
         # will return division result + remainder
@@ -113,7 +107,9 @@ def generator_departure_info(
         # decide remainder by 60 remainder which will be seconds
         minutes, seconds = divmod(remainder, 60)
 
-        yield DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
+        yield DepartureInfo(
+            hours, minutes, seconds, route, dest, location, type_, id_
+        )
 
 
 def create_date_and_time(
