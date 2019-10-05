@@ -47,6 +47,7 @@ def get_departures(id_: str):
     departures = CLIENT.find_destinations_for(
         'any', id_, expected_type
     )
+    print(departures.stop_events)
     departures_info = create_departure_info(departures)
     return render_template("departures.jinja2", departures_info=departures_info)
 
