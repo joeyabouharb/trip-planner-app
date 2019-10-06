@@ -53,6 +53,7 @@ def get_departures(id_: str):
         'any', id_, expected_type
     )
     departures_info = list(generator_departure_info(departures))
+    print(departures_info)
     return render_template("departures.jinja2", departures_info=departures_info)
 
 
