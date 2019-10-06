@@ -93,7 +93,7 @@ def generator_departure_info(
         # ensure datetime is formatted with timezone info
         today = datetime.now(tz=tz.gettz('Australia/Sydney'))
         countdown = parsed_date - today
-
+        print(countdown)
         # if the train has already passed skip to next data set
         if countdown.total_seconds() < 0:
             continue
