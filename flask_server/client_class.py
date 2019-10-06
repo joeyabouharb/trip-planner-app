@@ -5,7 +5,7 @@ the server. Caching Class
 """
 
 import sys
-from datetime import datetime
+from datetime import datetime, tzinfo
 
 from dateutil import tz
 from swagger_client.models.departure_monitor_response import DepartureMonitorResponse
@@ -63,7 +63,8 @@ class Client:
         """
 
     def find_destinations_for(
-            self, _type: str, query: str, request_type: str, date_time=datetime.today()
+            self, _type: str, query: str, request_type: str,
+            date_time=None
     ) -> DepartureMonitorResponse:
         """### find destinations for specific stop/location
         find destinations for a specified stop taking in
@@ -73,6 +74,9 @@ class Client:
                 usually any or stop, refer to the API docs for more info
                 \n- `query`: str -> station to search, can be key words, suburbs, IDs, etc
         """
+        if date_time is None:
+            date_time = datetime.now(tz.tzlocal()).astimezone(tz.gettz("Australia/Sydney"))
+
         # format datetime to a string
         format_date = '%Y%m%d'
         format_time = '%H%M'
@@ -113,7 +117,7 @@ class Client:
         departure, destination, dep = args
 
         date_time = (
-            datetime.now(tz=tz.gettz('Australia/Sydney'))
+            datetime.now(tz.tzlocal()).astimezone(tz=tz.gettz('Australia/Sydney'))
             if not kwargs.get('date_time', False) else kwargs['date_time']
         )
         calc_number_of_trips = (

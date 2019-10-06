@@ -91,7 +91,7 @@ def generator_departure_info(
         parsed_date = date_parser(departure_time)
         print('whats going on?')
         # ensure datetime is formatted with timezone info
-        today = datetime.now(tz=tz.gettz('Australia/Sydney'))
+        today = datetime.now(tz.tzlocal()).astimezone(tz=tz.gettz('Australia/Sydney'))
         countdown = parsed_date - today
         print(countdown.total_seconds())
         # if the train has already passed skip to next data set
@@ -109,7 +109,7 @@ def generator_departure_info(
         yield info
 
 
-def create_date_and_time(
+def     create_date_and_time(
         date: datetime, format_date: str, format_time: str
 ) -> (str, str):
     """
