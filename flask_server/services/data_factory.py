@@ -78,9 +78,7 @@ def generator_departure_info(
     yields:
         :return DepartureInfo
     """
-
-    if events.stop_events is None:
-        return False
+    print(events.stop_events)
     for event in events.stop_events:
         transport_type = event.transportation.product.icon_id
         transportation = event.transportation

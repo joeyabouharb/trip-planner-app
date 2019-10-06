@@ -52,7 +52,7 @@ def get_departures(id_: str):
     departures = CLIENT.find_destinations_for(
         'any', id_, expected_type
     )
-    departures_info = list(generator_departure_info(departures))
+    departures_info = list(generator_departure_info(departures)) if departures is not None else []
     print(departures_info)
     return render_template("departures.jinja2", departures_info=departures_info)
 
