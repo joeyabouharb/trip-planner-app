@@ -93,10 +93,8 @@ def generator_departure_info(
         # ensure datetime is formatted with timezone info
         today = datetime.now(tz=tz.gettz('Australia/Sydney'))
         countdown = parsed_date - today
-        print(countdown)
+        print(countdown.total_seconds())
         # if the train has already passed skip to next data set
-        if countdown.total_seconds() < 0:
-            continue
 
         # in order to calculate the hours, minutes and secs, we must
         # divide the total seconds to produce total hours and divide the
