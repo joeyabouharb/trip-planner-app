@@ -75,7 +75,8 @@ def generator_departure_info(
     args
         :arg: `events`: `DepartureMonitorResponse` -> stop events for a specified location
         :arg: `of_type`: str -> specified stop type ID to filter. as defined in the API docs
-    yields: DepartureInfo
+    yields:
+        :return DepartureInfo
     """
 
     if events.stop_events is None:
@@ -106,10 +107,10 @@ def generator_departure_info(
         hours, remainder = divmod(countdown.seconds, 3600)
         # decide remainder by 60 remainder which will be seconds
         minutes, seconds = divmod(remainder, 60)
-
-        yield DepartureInfo(
-            hours, minutes, seconds, route, dest, location, type_, id_
-        )
+        print(hours, minutes, seconds)
+        info = DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
+        print(info)
+        yield info
 
 
 def create_date_and_time(
