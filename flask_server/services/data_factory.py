@@ -89,7 +89,7 @@ def generator_departure_info(
         type_ = VALID_TRANSPORT[transport_type]
         departure_time = event.departure_time_planned
         parsed_date = date_parser(departure_time)
-
+        print('whats going on?')
         # ensure datetime is formatted with timezone info
         today = datetime.now(tz=tz.gettz('Australia/Sydney'))
         countdown = parsed_date - today
@@ -102,9 +102,9 @@ def generator_departure_info(
         # divide the total seconds to produce total hours and divide the
         # remainder to find minutes and seconds
         # will return division result + remainder
-        hours, remainder = divmod(countdown.seconds, 3600)
+        hours, remainder = countdown.seconds // 3600, countdown.seconds % 3600
         # decide remainder by 60 remainder which will be seconds
-        minutes, seconds = divmod(remainder, 60)
+        minutes, seconds = remainder // 60, remainder % 60
         print(hours, minutes, seconds)
         info = DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
         print(info)
