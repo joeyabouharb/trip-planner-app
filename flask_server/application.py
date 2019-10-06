@@ -53,8 +53,7 @@ def get_departures(id_: str):
         'any', id_, expected_type
     )
     departures_info = generator_departure_info(departures)
-    sorted_departures = sorted(departures_info, key=attrgetter('location'))
-    return render_template("departures.jinja2", departures_info=sorted_departures)
+    return render_template("departures.jinja2", departures_info=departures_info)
 
 
 @app.route('/stops')
