@@ -4,7 +4,12 @@
     <h2> Search Departures By stop </h2>
     <div>
         <form method="GET" action="/stops">
+            <div style="display: flex">
             <label> Search: <input type="search" name="query"/> </label>
+            <label> Day: <input type="date" name="date"/></label>
+                <label>Time: <input type="text" name="time" placeholder="eg. 09:30AM"/> </label>
+
+            </div>
             <div>
                 <label> Trains <input type="checkbox" name="1" value="1"/></label>
             </div>
@@ -22,7 +27,11 @@
         <ul>
         {% for id, location in data %}
             <li>
-                <a href="/departures/{{ id }}">{{location}}</a>
+                {% if id != '' or time != '' %}
+                    <a href="/departures/{{ id }}?date={{ date }}&time={{ time }}">{{location}}</a>
+                {% else %}
+                    <a href="/departures/{{ id }}">{{location}}</a>
+                {% endif %}
             </li>
 
         {% endfor %}

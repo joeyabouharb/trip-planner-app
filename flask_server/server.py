@@ -48,13 +48,26 @@ def get_departures(id_: str):
     """
     get departures for a certain stop ID
     """
+    date = request.args.get('date', '')
+    time = request.args.get("time", '')
+    if not date or not time:
+        date_time = None
+    else:
+        date_time = (date, time)
     expected_type = request.args.get('expected_type', 'dep')
     departures = CLIENT.find_destinations_for(
-        'any', id_, expected_type
+        'any', id_, expected_type, date_time=date_time
     )
-    departures_info = generator_departure_info(departures)if departures.stop_events is not None else []
-    departures_info = sorted(departures_info, key=attrgetter('location'))
-    return render_template("departures.jinja2", departures_info=departures_info)
+
+    departures_info = generator_departure_info(departures, date_time) if departures.stop_events is not None else []
+    sorted_departures = {}
+    for departure in departures_info:
+        location_key = sorted_departures.get(departure.location, False)
+        if not location_key:
+            sorted_departures[departure.location] = []
+        sorted_departures[departure.location].append(departure)
+
+    return render_template("departures.jinja2", departures_info=sorted_departures)
 
 
 @app.route('/stops')
@@ -64,6 +77,8 @@ def get_stop_information():
     returns a list of stops from entered key words
     :return:
     """
+    date = request.args.get('date', '')
+    time = request.args.get("time", '')
     req = request.args.get('query', False)
     stops = CLIENT.find_stops_by_name('any', req)
     is_suburb = bool(request.args.get('suburb', False))
@@ -78,7 +93,8 @@ def get_stop_information():
         if req else []
     )  # return an empty list if no location was returned
     return render_template(
-        'stops.jinja2', data=data, selected_type=selections
+        'stops.jinja2', data=data, selected_type=selections,
+        date=date, time=time
     )
 
 

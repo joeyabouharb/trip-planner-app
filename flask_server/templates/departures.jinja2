@@ -7,14 +7,14 @@
                 <p>No Services are currently available at this stop</p>
             {% endif %}
             <ul>
-            {% for departure in departures_info %}
-            {% set hours, minutes, seconds = departure.time_to_arrive %}
+            {% for location, departure_info in departures_info.items() %}
                 <section>
-                    {% if loop.changed(departure.location) %}
-                        <h3> {{ departure.location }} </h3>
-                    {% endif %}
-                    <p>{{ hours }} hours, {{ minutes }} minutes, {{ seconds }} and seconds</p>
-                    <p>{{ departure.route }} to {{ departure.dest }}
+                    <h3> {{ location }} </h3>
+                        {% for departure in departure_info %}
+                            {% set hours, minutes, seconds = departure.time_to_arrive %}
+                            <p>{{ hours }} hours, {{ minutes }} minutes, and {{ seconds }} seconds</p>
+                            <p>{{ departure.route }} to {{ departure.dest }}
+                        {% endfor %}
                 </section>
             {% endfor %}
             </ul>

@@ -9,7 +9,14 @@
                     <a href="/">Home</a>
                     <a href="/stops">Stop Departures</a>
                     <a href="/trip-planner">Trip Planner</a>
+                    <a style="float: right" id="currentTime"></a>
                 </nav>
+                <script>
+                    const date = new Date();
+                    const item = document.getElementById("currentTime");
+                    console.log(date.toLocaleString());
+                    item.innerText = date.toLocaleString();
+                </script>
             </section>
             <section>
             {% block content %} {% endblock %}

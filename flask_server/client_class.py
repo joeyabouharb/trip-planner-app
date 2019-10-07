@@ -18,7 +18,7 @@ from flask_server.services.app_locals import (
     VALID_EXCLUSIONS, JSON_FORMAT, COORDINATE_FORMAT
 )
 from flask_server.services.data_factory import (
-    create_date_and_time
+    create_date_and_time, date_parser
 )
 
 
@@ -74,14 +74,17 @@ class Client:
                 usually any or stop, refer to the API docs for more info
                 \n- `query`: str -> station to search, can be key words, suburbs, IDs, etc
         """
-        if date_time is None:
-            date_time = datetime.now(tz.tzlocal()).astimezone(tz.gettz("Australia/Sydney"))
-
-        # format datetime to a string
         format_date = '%Y%m%d'
         format_time = '%H%M'
-
-        date_str, time = create_date_and_time(date_time, format_date, format_time)
+        if date_time is None:
+            date_time = datetime.now(tz.tzlocal()).astimezone(tz.gettz("Australia/Sydney"))
+            # format datetime to a string
+            date_str, time = create_date_and_time(date_time, format_date, format_time)
+        else:
+            date_str, time = date_time
+            is_date = date_parser(f'{date_str} {time}', '%Y/%m/%d %I:%M%p')
+            if is_date:
+                date_str, time = create_date_and_time(is_date, format_date, format_time)
         # sends a request to the api using the swagger instance
         try:
             req = self._instance.tfnsw_dm_request(

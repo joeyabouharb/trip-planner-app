@@ -61,15 +61,18 @@ def date_parser(
     to_zone = tz.gettz('Australia/Sydney')
     # replace will specify the date format to convert from (UTC)
     # and `as times zone` will convert it to specified timezone eg. Australian EST
-    parsed_date = datetime.strptime(
-        departure_time, time_format
-    ).replace(tzinfo=from_zone).astimezone(to_zone)
-
+    try:
+        parsed_date = datetime.strptime(
+            departure_time, time_format
+        ).replace(tzinfo=from_zone).astimezone(to_zone)
+    except ValueError as err:
+        print(err)
+        parsed_date = None
     return parsed_date
 
 
 def generator_departure_info(
-        events: DepartureMonitorResponse
+        events: DepartureMonitorResponse, date_time=None
 ) -> Sequence[DepartureInfo]:
     """## Generate departure information for a stop
     args
@@ -78,7 +81,7 @@ def generator_departure_info(
     yields:
         :return DepartureInfo
     """
-    print(events.stop_events)
+
     for event in events.stop_events:
         transport_type = event.transportation.product.icon_id
         transportation = event.transportation
@@ -90,10 +93,17 @@ def generator_departure_info(
         departure_time = event.departure_time_planned
         parsed_date = date_parser(departure_time)
         # ensure datetime is formatted with timezone info
-        today = datetime.now(tz.tzlocal())
-        print(today.tzname())
-        today = today.astimezone(tz=tz.gettz('Australia/Sydney'))
-        countdown = parsed_date - today
+        # convert date to AEST
+        if date_time is None:
+            planned_date = datetime.now(tz.tzlocal())
+            planned_date = planned_date.astimezone(tz=tz.gettz('Australia/Sydney'))
+            countdown = parsed_date - planned_date
+        else:
+            date, time = date_time
+            planned_date = datetime.strptime(
+                f'{date} {time}', '%Y/%m/%d %I:%M%p'
+            ).replace(tzinfo=tz.gettz('AEST'))
+            countdown = parsed_date - planned_date
         # if the train has already passed skip to next data set
 
         # in order to calculate the hours, minutes and secs, we must
