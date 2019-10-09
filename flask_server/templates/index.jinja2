@@ -3,8 +3,19 @@
     {% block content %}
     <h2> Dashboard </h2>
     <div>
+    {% for origin, destination in trips %}
         <p>
-        {{ dashboard }}
+            {% set origin_id, origin_name = origin %}
+            {% set destination_id, destination_name = destination %}
+                <a
+                        href="/trip/journeys?origin={{ origin_id }}&dest={{ destination_id }}"
+                >
+                    From {{ origin_name }} to {{ destination_name }}
+                </a>
         </p>
+    {% endfor %}
+    {% if not trips %}
+        <p>No Trips saved!</p>
+    {% endif %}
     </div>
     {% endblock %}

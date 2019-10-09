@@ -6,7 +6,7 @@ and converting data types
 such as dates, etc
 """
 from datetime import datetime
-from typing import Sequence
+from typing import Sequence, Dict
 
 from dateutil import tz
 from swagger_client.models import (
@@ -22,7 +22,12 @@ def generator_stop_information(
         selected_types: Sequence[int], query: str, is_suburb=False
 ) -> Sequence[tuple]:
     """
-    get stop information
+
+    :param locations:
+    :param selected_types:
+    :param query:
+    :param is_suburb:
+    :return: Sequence[tuple]
     """
 
     for location in locations:
@@ -151,11 +156,12 @@ def generator_trip_data(
             \nstops: dict -> all stops in journey
     """
 
-    def get_stop_info():
+    def get_stop_info() -> Dict:
         """
-        modifies existing dictionary and appends
-        new stopping information for each 'leg' in a journey
+        gets stop information in all legs of the current trip journey
+        :return: result as dict
         """
+        result = {}
         type_ = ''
         for leg in legs:
             if leg.stop_sequence is None:
@@ -167,7 +173,7 @@ def generator_trip_data(
                         leg.transportation.name
                         if leg.transportation.name is not None else 'walk'  # trip is walk if None
                     )
-                    stops[type_] = []
+                    result[type_] = []
 
                 # attempt to get live updates/ estimated otherwise get planned dep/arrival times
                 if sequence.departure_time_estimated is not None:
@@ -184,13 +190,13 @@ def generator_trip_data(
                 if departure_time != 'Unavailable':
                     # parse dates and return the formatted time string only
                     _, departure_time = create_date_and_time(departure_time, '', '%H:%M')
-                stops[type_].append(f'{sequence.name} arrives: {departure_time}')
+                result[type_].append(f'{sequence.name} arrives: {departure_time}')
+        return result
     # end of function
 
     for journey in journeys:
         legs = journey.legs
         fares = journey.fare.tickets
-
         total_fare = sum(
             float(fare.properties.price_total_fare)
             for fare in fares if fare.person == 'SCHOLAR'
@@ -210,10 +216,9 @@ def generator_trip_data(
 
         arrive = date_parser(legs[-1].destination.arrival_time_estimated)
         arrive_day, arrive_time = create_date_and_time(arrive, '%A,  %d-%m-%Y', '%H:%M%Z')
-        stops = {}
-        get_stop_info()  # append list of stops in legs to stops dict
-
+        stops = get_stop_info()  # get list of stops in legs as dict
         yield TripJourney(
-            total_fare, total_duration, summary, depart_day, depart_time,
+            total_fare, total_duration, summary,
+            depart_day, depart_time,
             arrive_day, arrive_time, stops
         )

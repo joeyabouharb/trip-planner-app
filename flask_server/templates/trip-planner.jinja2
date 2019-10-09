@@ -3,7 +3,7 @@
     {% block content %}
         <section>
         <h2>Plan a Trip:</h2>
-            <form method="GET" action="/trip-planner">
+            <form method="GET" action="/trip/planner">
                 <label> Origin: <input name="origin" type="search" placeholder="Enter Origin Stop"/></label>
                 <label> Suburb <input name="origin_suburb" type="checkbox"  value="1"/></label>
                 <label> Destination: <input name="destination" placeholder="Enter Destination Stop" type="search"/></label>
@@ -15,7 +15,7 @@
             <h3>Results: </h3>
             <div>
                 {% if destinations and origins %}
-                    <form method="GET" action="/journeys">
+                    <form method="GET" action="/trip/journeys">
                             <label>Origins: <select name="origin">
                                 {% for id, name in origins %}
                                 <option value="{{ id }}">{{ name }}</option>

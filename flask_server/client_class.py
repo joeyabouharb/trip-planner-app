@@ -5,7 +5,7 @@ the server. Caching Class
 """
 
 import sys
-from datetime import datetime, tzinfo
+from datetime import datetime
 
 from dateutil import tz
 from swagger_client.models.departure_monitor_response import DepartureMonitorResponse
@@ -15,7 +15,7 @@ from swagger_client.rest import ApiException
 
 import flask_server.services.swagger_instance as instance
 from flask_server.services.app_locals import (
-    VALID_EXCLUSIONS, JSON_FORMAT, COORDINATE_FORMAT
+   JSON_FORMAT, COORDINATE_FORMAT
 )
 from flask_server.services.data_factory import (
     create_date_and_time, date_parser
@@ -26,14 +26,14 @@ class Client:
     """# Client API Class for Trip Planner
     \ninitialises a swagger client to connect\
     to the trip planner api
-    \n- `_instance` *protected* : TripPlannerAPI -> initialises swagger client instance
-    \n- `result`: TripPlannerResponse -> Response from API server
-    \n- `error`: int -> http error code / msg
+    - `_instance` *protected* : TripPlannerAPI -> initialises swagger client instance
+    - `result`: TripPlannerResponse -> Response from API server
+    - `error`: int -> http error code / msg
     """
 
     def __init__(self, key):
+        # start up swagger client instance upon initialisation
         self._instance = instance.start(key)
-        self.result = None
         self.error = None
         self.version = '10.2.1.42'  # stable version
 
@@ -41,11 +41,11 @@ class Client:
             self, _type: str, query: str, is_id=False
     ) -> StopFinderResponse:
         """### Find Stop by name
-        \nfind a stop from a specified POI, or suburb
-        \nArgs:
-            \n_type: specify type of stop specified by the api docs usually\
+        find a stop from a specified POI, or suburb
+        Args:
+            _type: specify type of stop specified by the api docs usually\
             `any`, `stop`, `platform`, etc.
-            \nquery: search query, usually a stop ID or a name type: (str)
+            query: search query, usually a stop ID or a name type: (str)
         """
         # if search based on trip_id. returns the best match on true
         tf_nswsf = "true" if is_id else ""
@@ -69,10 +69,10 @@ class Client:
         """### find destinations for specific stop/location
         find destinations for a specified stop taking in
         arrival/departure times, etc
-            \nArgs:
-                \n- `_type`: str -> type of stop to be searched,\
+            Args:
+                - `_type`: str -> type of stop to be searched,\
                 usually any or stop, refer to the API docs for more info
-                \n- `query`: str -> station to search, can be key words, suburbs, IDs, etc
+                - `query`: str -> station to search, can be key words, suburbs, IDs, etc
         """
         format_date = '%Y%m%d'
         format_time = '%H%M'
@@ -101,20 +101,20 @@ class Client:
     def find_trips_for_stop(
             self, *args, **kwargs
     ) -> TripRequestResponse:
-        """\n### Find Trips For Stop
+        """### Find Trips For Stop
         \nfind trips (possible departures) for a stop by taking in the departure origin and destination
         and a specified time and saves the result to the client `self.result` property
-            \n*Args:
+            *Args:
                 \ndeparture: tuple -> location of origin  - ID or coordinates,
-                    \n- specify ID with ('any', 'ID'),
-                    \n- coordinates with ('coord', [long, lat]),
+                    - specify ID with ('any', 'ID'),
+                    - coordinates with ('coord', [long, lat]),
                 \ndestination: tuple -> location of destination - ID or coordinates
-                    \n- specify ID with ('any', 'ID')
-                    \n- coordinates with ('coord', [long, lat])
-            \n**kwargs:-> containing additional information like:
-                \n- `date_time`: datetime: specified time
-                \n- `calc_num_of_trips`: total number of trips to be returned
-                \n- `wheelchair`: str -> default set to 'off'.
+                    - specify ID with ('any', 'ID')
+                    - coordinates with ('coord', [long, lat])
+            **kwargs:-> containing additional information like:
+                - `date_time`: datetime: specified time
+                - `calc_num_of_trips`: total number of trips to be returned
+                - `wheelchair`: str -> default set to 'off'.
                 set 'on' to return wheelchair accessible options
         """
         departure, destination, dep = args

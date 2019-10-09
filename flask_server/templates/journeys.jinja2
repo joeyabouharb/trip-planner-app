@@ -1,7 +1,13 @@
 {% extends "layout.jinja2" %}
-{% block title %} Options for: {{ origin_name[1] }} to {{ destination_name[1] }}:{% endblock %}
+{% block title %} Options for: {{ origin[1] }} to {{ destination[1] }}:{% endblock %}
     {% block content %}
-
+        <form action="/trip/save" method="POST">
+           <input aria-label="origin" type="text" name="origin" value="{{ origin[0] }}" hidden/>
+            <input aria-label="origin_name" type="text" name="origin_name" value="{{ origin[1] }}" hidden />
+            <input aria-label="destination" type="text" name="destination" value="{{ destination[0] }}" hidden/>
+            <input aria-label="destination_name" type="text" name="destination_name" value="{{ destination[1] }}" hidden/>
+        <button type="submit">Save Trip</button>
+        </form>
         {% for trip in trips %}
         <h1> Journey Option {{ loop.index }}: </h1>
         <section>
