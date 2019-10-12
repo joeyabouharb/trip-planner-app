@@ -102,13 +102,11 @@ def generator_departure_info(
         if date_time is None:
             planned_date = datetime.now(tz.tzlocal())
             planned_date = planned_date.astimezone(tz=tz.gettz('Australia/Sydney'))
-            countdown = parsed_date - planned_date
         else:
-            date, time = date_time
             planned_date = datetime.strptime(
-                f'{date} {time}', '%Y/%m/%d %I:%M%p'
+                f'{date_time[0]} {date_time[1]}', '%Y/%m/%d %I:%M%p'
             ).replace(tzinfo=tz.gettz('AEST'))
-            countdown = parsed_date - planned_date
+        countdown = parsed_date - planned_date
         # if the train has already passed skip to next data set
 
         # in order to calculate the hours, minutes and secs, we must
@@ -118,8 +116,7 @@ def generator_departure_info(
         hours, remainder = countdown.seconds // 3600, countdown.seconds % 3600
         # decide remainder by 60 remainder which will be seconds
         minutes, seconds = remainder // 60, remainder % 60
-        info = DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
-        yield info
+        yield DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
 
 
 def create_date_and_time(
@@ -222,3 +219,21 @@ def generator_trip_data(
             depart_day, depart_time,
             arrive_day, arrive_time, stops
         )
+
+def generate_status_info(stop):
+    if stop is None:
+        return False
+    messages = []
+    for message in stop:
+        title = message.subtitle
+        content = message.content
+        priority = message.priority
+        timestamp = message.timestamps
+        from_time = date_parser(timestamp.creation)
+        date, time = create_date_and_time(from_time, "%Y-%m-%d", "%H:%M")
+        from_time = f'{date} {time}'
+        to = date_parser(timestamp.validity[-1].to)
+        date, time = create_date_and_time(to, "%Y-%m-%d", "%H:%M")
+        to = f'{date} {time}'
+        messages.append((priority, title, content, from_time, to))
+    return messages

@@ -28,9 +28,9 @@
         {% for id, location in data %}
             <li>
                 {% if id != '' or time != '' %}
-                    <a href="/departures/{{ id }}?date={{ date }}&time={{ time }}">{{location}}</a>
+                    <a href="/stops/departures/{{ id }}?date={{ date }}&time={{ time }}">{{location}}</a>
                 {% else %}
-                    <a href="/departures/{{ id }}">{{location}}</a>
+                    <a href="/stops/departures/{{ id }}">{{location}}</a>
                 {% endif %}
             </li>
 

@@ -7,13 +7,13 @@ class TripJourney:
     """
     model class defining properties for a single journey,
     including total fares, duration, stop info and departure / arrival times,
-        \nProperties:
-            \n`total_fare`: float -> stores fare cost (USD),
-            \n`total_duration`: float -> stores duration of journey,
-            \n`summary`: list -> contains a list to summarize the transport types used in journey,
-            \n`departure`: tuple -> contains a tuple of strings describing departure time (day, time),
-            \n`arrival`: tuple -> contains tuple of time(str) of arrival (day, time),
-            \n`stops`s: dict -> describes all stop information of trip, containing times and trip network,
+        Properties:
+            `total_fare`: float -> stores fare cost (USD),
+            `total_duration`: float -> stores duration of journey,
+            `summary`: list -> list to summarize the transport types used in journey,
+            `departure`: tuple ->  tuple of strings describing departure time (day, time),
+            `arrival`: tuple -> tuple of time(str) of arrival (day, time),
+            `stops`s: dict -> describes all stop information of trip, containing times
     """
     def __init__(self, *args):
 

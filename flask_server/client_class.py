@@ -11,6 +11,7 @@ from dateutil import tz
 from swagger_client.models.departure_monitor_response import DepartureMonitorResponse
 from swagger_client.models.stop_finder_response import StopFinderResponse
 from swagger_client.models.trip_request_response import TripRequestResponse
+from swagger_client.models.additional_info_response import AdditionalInfoResponse
 from swagger_client.rest import ApiException
 
 import flask_server.services.swagger_instance as instance
@@ -51,12 +52,15 @@ class Client:
         tf_nswsf = "true" if is_id else ""
         try:
             req = self._instance.tfnsw_stopfinder_request(
-                JSON_FORMAT, _type, query, COORDINATE_FORMAT, version=self.version, tf_nswsf=tf_nswsf
+                JSON_FORMAT, _type, query, COORDINATE_FORMAT,
+                version=self.version, tf_nswsf=tf_nswsf
             )
             self.error = 404 if req is None else 200
-            return req
-        except ApiException as err:
-            sys.exit(err)
+        except Exception as err:
+            print(err)
+            req = None
+            self.error = 500
+        return req
 
     def find_stops_near_coord(self, *params):
         """
@@ -92,10 +96,12 @@ class Client:
                 request_type, date_str, time,
                 mode='direct', tf_nswdm="true", version=self.version
             )
-        except ApiException as err:
-            sys.exit(err)
+            self.error = 404 if req.stop_events is None else 200
+        except Exception as err:
+            print(err)
+            req = None
+            self.error = 500
 
-        self.error = 404 if req.stop_events is None else 200
         return req
 
     def find_trips_for_stop(
@@ -136,12 +142,18 @@ class Client:
                 JSON_FORMAT, COORDINATE_FORMAT, dep, date_str, time, *departure,
                 *destination, tf_nswtr="true", calc_number_of_trips=calc_number_of_trips, version=self.version)
             self.error = 404 if req.journeys is None else 200
-            return req
-        except ApiException as err:
-            sys.exit(err)
+        except Exception as err:
+            print(err)
+            req = None
+            self.error = 500
+        return req
 
-    def request_status_info(self, *params):
+    def request_status_info(self, stop, publication_status="current") -> AdditionalInfoResponse:
         """
         find detailed status reports on potential, train works,
         delays for specified stops. Not implemented
         """
+        req = self._instance.tfnsw_addinfo_request(
+            JSON_FORMAT, itd_l_pxx_sel_stop=stop, filter_publication_status=publication_status
+        )
+        return req
