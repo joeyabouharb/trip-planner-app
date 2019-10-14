@@ -20,7 +20,6 @@ def home():
     trips_db = g.trips_db
     trips_db.read_db()
     stops = trips_db.data
-
     if g.client.error in [500, 404]:
         return render_template(
             'index.jinja2', trips=[], names=[],
@@ -34,7 +33,6 @@ def home():
 
     for stop in saved_stops:
         status = g.client.request_status_info(stop).infos.current
-
         status = generate_status_info(status)
   
         if status:

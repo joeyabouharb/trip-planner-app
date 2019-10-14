@@ -24,9 +24,13 @@ def generator_stop_information(
     """
 
     :param locations:
+
     :param selected_types:
+
     :param query:
+
     :param is_suburb:
+
     :return: Sequence[tuple]
     """
 
@@ -54,10 +58,14 @@ def date_parser(
     """
     parses a date string using the specified date_time_format
     and converts it to Australian Time localtime
-        args:
-            `departure_time`: str -> time of departure in string format, implied UTC format
-            `time_format`: str -> format to aid in parsing string to datetime
-        :rtype: datetime
+
+    args:
+
+    `departure_time`: str -> time of departure in string format, implied UTC format
+
+    `time_format`: str -> format to aid in parsing string to datetime
+
+    :rtype: datetime
     """
     # Specify Timezone to convert to and from ie UTC -> Sydney localtime
     # this pulls localtime information from `/usr/share/zoneinfo` (linux sys)
@@ -81,10 +89,14 @@ def generator_departure_info(
 ) -> Sequence[DepartureInfo]:
     """## Generate departure information for a stop
     args
-        :arg: `events`: `DepartureMonitorResponse` -> stop events for a specified location
-        :arg: `of_type`: str -> specified stop type ID to filter. as defined in the API docs
+
+    :arg: `events`: `DepartureMonitorResponse` -> stop events for a specified location
+
+    :arg: `of_type`: str -> specified stop type ID to filter. as defined in the API docs
+
     yields:
-        :return DepartureInfo
+
+    :return DepartureInfo
     """
 
     for event in events.stop_events:
@@ -126,10 +138,14 @@ def create_date_and_time(
     returns a tuple of strings containing a formatted
     date and time strings, taking in a datetime object
     and the specified formats for date and time in `format_date` and `format_time`
-        \nArgs:
-            \ndate: datetime - date to format to str,
-            \nformat_date: str - specified date format,
-            \nformat_time: str - specified time format,
+
+    Args:
+
+    date: datetime - date to format to str,
+
+    format_date: str - specified date format,
+
+    format_time: str - specified time format,
     """
 
     today = datetime.strftime(date, format_date)
@@ -141,21 +157,31 @@ def generator_trip_data(
         journeys: Sequence[TripRequestResponseJourney]
 ) -> Sequence[TripJourney]:
     """
-    yields trip information from journeys:
-        \nArgs:
-            \njourneys: list -> list of journeys, received from the API Call\n
-        \nYields:
-            \ntotal_fare: float -> cost of journey,
-            \ntotal_duration: float -> duration (in minutes) of journey,
-            \nsummary: list -> types of transport used in journey,
-            \ndepart_day, depart_time: tuple -> (str, str) -> departure day/time information,
-            \narrive_day, arrive_time: tuple -> (str, str) -> arrival day/time information,
-            \nstops: dict -> all stops in journey
+    ## yields trip information from journeys.
+
+    Args:
+
+    journeys: list -> list of journeys, received from the API Call
+
+    Yields:
+
+    total_fare: float -> cost of journey,
+
+    total_duration: float -> duration (in minutes) of journey,
+
+    summary: list -> types of transport used in journey,
+
+    depart_day, depart_time: tuple -> (str, str) -> departure day/time information,
+
+    arrive_day, arrive_time: tuple -> (str, str) -> arrival day/time information,
+
+    stops: dict -> all stops in journey
     """
 
     def get_stop_info() -> Dict:
         """
         gets stop information in all legs of the current trip journey
+        
         :return: result as dict
         """
         result = {}

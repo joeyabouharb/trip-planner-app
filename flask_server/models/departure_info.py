@@ -6,12 +6,18 @@ class model for departure information for a particular stop
 class DepartureInfo:
     """
     contains the information about departure information such as:
-        \nProps:
-            \n`hours`: int -> hours to departure,
-            \n`minutes`: int -> minutes to departure,
-            \n`seconds` int -> seconds to departure,
-            \n`route`: str -> route origin,
-            \n`dest`: str -> route destination,
+
+    Props:
+
+    `hours`: int -> hours to departure,
+
+    `minutes`: int -> minutes to departure,
+
+    `seconds` int -> seconds to departure,
+
+    `route`: str -> route origin,
+    
+    `dest`: str -> route destination,
     """
     def __init__(self, *props):
         hours, minutes, seconds, route, dest, location, type_, _id = props

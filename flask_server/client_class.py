@@ -25,10 +25,14 @@ from flask_server.services.data_factory import (
 
 class Client:
     """# Client API Class for Trip Planner
-    \ninitialises a swagger client to connect\
+
+    initialises a swagger client to connect\
     to the trip planner api
+
     - `_instance` *protected* : TripPlannerAPI -> initialises swagger client instance
+
     - `result`: TripPlannerResponse -> Response from API server
+
     - `error`: int -> http error code / msg
     """
 
@@ -44,9 +48,11 @@ class Client:
         """### Find Stop by name
         find a stop from a specified POI, or suburb
         Args:
-            _type: specify type of stop specified by the api docs usually\
-            `any`, `stop`, `platform`, etc.
-            query: search query, usually a stop ID or a name type: (str)
+
+        _type: specify type of stop specified by the api docs usually\
+        `any`, `stop`, `platform`, etc.
+
+        query: search query, usually a stop ID or a name type: (str)
         """
         # if search based on trip_id. returns the best match on true
         tf_nswsf = "true" if is_id else ""
@@ -71,12 +77,14 @@ class Client:
             date_time=None
     ) -> DepartureMonitorResponse:
         """### find destinations for specific stop/location
-        find destinations for a specified stop taking in
-        arrival/departure times, etc
-            Args:
-                - `_type`: str -> type of stop to be searched,\
-                usually any or stop, refer to the API docs for more info
-                - `query`: str -> station to search, can be key words, suburbs, IDs, etc
+        find destinations for a specified stop taking in arrival/departure times, etc
+
+        Args:
+
+        - `_type`: str -> type of stop to be searched,\
+        usually any or stop, refer to the API docs for more info
+
+        - `query`: str -> station to search, can be key words, suburbs, IDs, etc
         """
         format_date = '%Y%m%d'
         format_time = '%H%M'
@@ -108,20 +116,32 @@ class Client:
             self, *args, **kwargs
     ) -> TripRequestResponse:
         """### Find Trips For Stop
-        \nfind trips (possible departures) for a stop by taking in the departure origin and destination
+        find trips (possible departures) for a stop by taking in the departure origin and destination
         and a specified time and saves the result to the client `self.result` property
-            *Args:
-                \ndeparture: tuple -> location of origin  - ID or coordinates,
-                    - specify ID with ('any', 'ID'),
-                    - coordinates with ('coord', [long, lat]),
-                \ndestination: tuple -> location of destination - ID or coordinates
-                    - specify ID with ('any', 'ID')
-                    - coordinates with ('coord', [long, lat])
-            **kwargs:-> containing additional information like:
-                - `date_time`: datetime: specified time
-                - `calc_num_of_trips`: total number of trips to be returned
-                - `wheelchair`: str -> default set to 'off'.
-                set 'on' to return wheelchair accessible options
+
+        *Args:
+
+        departure: tuple -> location of origin  - ID or coordinates,
+
+        - specify ID with ('any', 'ID'),
+
+        - coordinates with ('coord', [long, lat]),
+
+        destination: tuple -> location of destination - ID or coordinates
+
+        - specify ID with ('any', 'ID')
+
+        - coordinates with ('coord', [long, lat])
+
+        **kwargs:-> containing additional information like:
+
+        - `date_time`: datetime: specified time
+
+        - `calc_num_of_trips`: total number of trips to be returned
+
+        - `wheelchair`: str -> default set to 'off'.
+
+        set 'on' to return wheelchair accessible options
         """
         departure, destination, dep = args
 
@@ -150,8 +170,9 @@ class Client:
 
     def request_status_info(self, stop, publication_status="current") -> AdditionalInfoResponse:
         """
-        find detailed status reports on potential, train works,
-        delays for specified stops. Not implemented
+        find detailed status reports on potential, train works, delays for specified stops.
+        
+        Not implemented
         """
         req = self._instance.tfnsw_addinfo_request(
             JSON_FORMAT, itd_l_pxx_sel_stop=stop, filter_publication_status=publication_status
