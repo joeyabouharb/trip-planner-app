@@ -1,8 +1,9 @@
-
 from flask import request, render_template, redirect, Blueprint, g
+
 from flask_server.services.app_locals import VALID_TRANSPORT
-from flask_server.services.data_factory import generator_stop_information, generator_departure_info
 from flask_server.services.cache_class import Cache
+from flask_server.services.data_service import stop_information_generator, departure_info_generator, \
+    status_info_generator
 
 STOP_BLUEPRINT = Blueprint('stops', __name__, url_prefix='/stops')
 
@@ -10,6 +11,7 @@ STOP_BLUEPRINT = Blueprint('stops', __name__, url_prefix='/stops')
 @STOP_BLUEPRINT.before_request
 def create_stop_db():
     g.stop_db = Cache('stops')
+
 
 @STOP_BLUEPRINT.route('/departures/<id_>')
 def get_departures(id_: str):
@@ -27,7 +29,7 @@ def get_departures(id_: str):
         'any', id_, expected_type, date_time=date_time
     )
 
-    departures_info = generator_departure_info(departures, date_time)\
+    departures_info = departure_info_generator(departures, date_time) \
         if departures.stop_events is not None else []
     sorted_departures = {}
     for departure in departures_info:
@@ -35,8 +37,21 @@ def get_departures(id_: str):
         if not location_key:
             sorted_departures[departure.location] = []
         sorted_departures[departure.location].append(departure)
+    return render_template(
+        "departures.jinja2", departures_info=sorted_departures, id=id_
+    )
 
-    return render_template("departures.jinja2", departures_info=sorted_departures, id=id_)
+
+@STOP_BLUEPRINT.route('/status/<id_>')
+def get_status_info(id_):
+    """
+    get status info from ID
+    :param id_:
+    :return: View
+    """
+    statuses = g.client.request_status_info(id_).infos.current
+    statuses = status_info_generator(statuses)
+    return render_template('statuses.jinja2', statuses=statuses)
 
 
 @STOP_BLUEPRINT.route('/save', methods=['POST'])
@@ -66,7 +81,7 @@ def get_stop_information():
 
     locations = stops.locations
     data = (
-        generator_stop_information(locations, selections, req, is_suburb)
+        stop_information_generator(locations, selections, req, is_suburb)
         if req else []
     )  # return an empty list if no location was returned
     return render_template(

@@ -7,7 +7,8 @@
         <p>
             {% set origin_id, origin_name = origin %}
             {% set destination_id, destination_name = destination %}
-                <a
+            <!--suppress HtmlUnknownTarget -->
+            <a
                         href="/trip/journeys?origin={{ origin_id }}&dest={{ destination_id }}"
                 >
                     From {{ origin_name }} to {{ destination_name }}
@@ -18,14 +19,4 @@
         <p>No Trips saved!</p>
     {% endif %}
     </div>
-    {% for status in statuses %}
-    {% for message in status%}
-    {% set priority, title, content, from_time, to = message %}
-    <section>
-        <h3>{{ title }}</h3>
-        <h5><em>{{ from_time }} to {{ to }}<em></h5>
-        {{ content }}
-    </section>
-    {% endfor %}
-    {% endfor %}
     {% endblock %}

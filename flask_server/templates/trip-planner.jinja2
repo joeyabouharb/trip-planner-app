@@ -3,6 +3,7 @@
     {% block content %}
         <section>
         <h2>Plan a Trip:</h2>
+            <!--suppress HtmlUnknownTarget -->
             <form method="GET" action="/trip/planner">
                 <label> Origin: <input name="origin" type="search" placeholder="Enter Origin Stop"/></label>
                 <label> Suburb <input name="origin_suburb" type="checkbox"  value="1"/></label>
@@ -15,6 +16,7 @@
             <h3>Results: </h3>
             <div>
                 {% if destinations and origins %}
+                    <!--suppress HtmlUnknownTarget -->
                     <form method="GET" action="/trip/journeys">
                             <label>Origins: <select name="origin">
                                 {% for id, name in origins %}
@@ -28,7 +30,15 @@
                         {% endfor %}
                             </select>
                             </label>
-                    <button type="submit"> Select route </button>
+                        <label> Concession / Ticket Type:
+                            <select name="concession_type">
+                                <option value="ADULT">Adult</option>
+                                <option value="SCHOLAR">Student</option>
+                                <option value="CHILD">Child</option>
+                                <option value="SENIOR">Senior</option>
+                            </select> </label>
+
+                        <button type="submit"> Select route</button>
                     </form>
                 {% else %}
                     <p>No results</p>

@@ -1,0 +1,17 @@
+{% extends "layout.jinja2" %}
+{% block title %} Status for stop {{ stop }}  {% endblock %}
+{% block content %}
+    <h2> Status </h2>
+    {% if not statuses %}
+        <p>No status info at this time.</p>
+    {% else %}
+        {% for status in statuses %}
+            {% set priority, title, content, from_time, to = status %}
+            <section>
+                <h3>{{ title }}</h3>
+                <h5><em>{{ from_time }} to {{ to }}</em></h5>
+                {{ content }}
+            </section>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

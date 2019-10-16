@@ -1,7 +1,8 @@
 {% extends "layout.jinja2" %}
     {% block title %} Search for stop:  {% endblock %}
     {% block content %}
-    <h2> Search Departures By stop </h2>
+        <!--suppress ALL -->
+        <h2> Search Departures By stop </h2>
     <div>
         <form method="GET" action="/stops">
             <div style="display: flex">
@@ -22,16 +23,19 @@
             <label> Suburb <input name="suburb" type="checkbox"  value="1"/></label>
             <button type="submit"> search </button>
         </form>
-    <div>
+    </div>
     <section>
         <ul>
         {% for id, location in data %}
             <li>
                 {% if id != '' or time != '' %}
-                    <a href="/stops/departures/{{ id }}?date={{ date }}&time={{ time }}">{{location}}</a>
+                    <ul><span>{{ location }}</span>
+                    <li><a href="/stops/departures/{{ id }}?date={{ date }}&time={{ time }}">Departures</a></li>
                 {% else %}
-                    <a href="/stops/departures/{{ id }}">{{location}}</a>
+                    <li><a href="/stops/departures/{{ id }}">Departures</a></li>
                 {% endif %}
+                <li><a href="/stops/status/{{ id }}"> Status Info </a></li>
+                </ul>
             </li>
 
         {% endfor %}

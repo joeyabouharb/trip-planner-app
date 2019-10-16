@@ -10,27 +10,26 @@ from typing import Sequence, Dict
 
 from dateutil import tz
 from swagger_client.models import (
-    DepartureMonitorResponse, StopFinderLocation, TripRequestResponseJourney
+    DepartureMonitorResponse, StopFinderLocation,
+    TripRequestResponseJourney, AdditionalInfoResponseMessage
 )
+
 from flask_server.models.departure_info import DepartureInfo
 from flask_server.models.trip_journey import TripJourney
 from flask_server.services.app_locals import VALID_TRANSPORT
 
 
-def generator_stop_information(
+def stop_information_generator(
         locations: Sequence[StopFinderLocation],
         selected_types: Sequence[int], query: str, is_suburb=False
 ) -> Sequence[tuple]:
     """
-
+    generate information about current stops, filter by suburb and yield
+    mathing stop names
     :param locations:
-
     :param selected_types:
-
     :param query:
-
     :param is_suburb:
-
     :return: Sequence[tuple]
     """
 
@@ -84,7 +83,7 @@ def date_parser(
     return parsed_date
 
 
-def generator_departure_info(
+def departure_info_generator(
         events: DepartureMonitorResponse, date_time=None
 ) -> Sequence[DepartureInfo]:
     """## Generate departure information for a stop
@@ -153,8 +152,8 @@ def create_date_and_time(
     return today, time
 
 
-def generator_trip_data(
-        journeys: Sequence[TripRequestResponseJourney]
+def trip_journeys_generator(
+        journeys: Sequence[TripRequestResponseJourney], concession_type: str
 ) -> Sequence[TripJourney]:
     """
     ## yields trip information from journeys.
@@ -194,7 +193,7 @@ def generator_trip_data(
                     # create new key entry for each leg/ network change in journey
                     type_ = (
                         leg.transportation.name
-                        if leg.transportation.name is not None else 'walk'  # trip is walk if None
+                        if leg.transportation.name is not None else 'Walking'  # trip is walk if None
                     )
                     result[type_] = []
 
@@ -222,7 +221,7 @@ def generator_trip_data(
         fares = journey.fare.tickets
         total_fare = sum(
             float(fare.properties.price_total_fare)
-            for fare in fares if fare.person == 'SCHOLAR'
+            for fare in fares if fare.person == concession_type
         )  # Sum of fare
 
         # calculate total duration in minutes and round up 2 decimal places
@@ -246,11 +245,16 @@ def generator_trip_data(
             arrive_day, arrive_time, stops
         )
 
-def generate_status_info(stop):
-    if stop is None:
+
+def status_info_generator(current_infos: Sequence[AdditionalInfoResponseMessage]):
+    """
+    generates status info for a stop
+    :param current_infos:
+    :return: tuple( priority, title, content, from_time, to )
+    """
+    if current_infos is None:
         return False
-    messages = []
-    for message in stop:
+    for message in current_infos:
         title = message.subtitle
         content = message.content
         priority = message.priority
@@ -261,5 +265,4 @@ def generate_status_info(stop):
         to = date_parser(timestamp.validity[-1].to)
         date, time = create_date_and_time(to, "%Y-%m-%d", "%H:%M")
         to = f'{date} {time}'
-        messages.append((priority, title, content, from_time, to))
-    return messages
+        yield priority, title, content, from_time, to

@@ -1,6 +1,7 @@
 {% extends "layout.jinja2" %}
 {% block title %} Options for: {{ origin[1] }} to {{ destination[1] }}:{% endblock %}
     {% block content %}
+        <!--suppress HtmlUnknownTarget -->
         <form action="/trip/save" method="POST">
            <input aria-label="origin" type="text" name="origin" value="{{ origin[0] }}" hidden/>
             <input aria-label="origin_name" type="text" name="origin_name" value="{{ origin[1] }}" hidden />

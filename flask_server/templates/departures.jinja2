@@ -1,7 +1,8 @@
 {% extends "layout.jinja2" %}
     {% block title %} Departures {% endblock %}
     {% block content %}
-    <form method="POST" action="/stops/save">
+        <!--suppress HtmlUnknownTarget -->
+        <form method="POST" action="/stops/save">
         <input type="text" name="id" aria-label="id" value="{{ id }}" hidden />
         <button type="submit"> Save Stop </button>
     </form>

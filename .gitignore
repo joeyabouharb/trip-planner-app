@@ -15,6 +15,7 @@
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
+**/venv/
 venv/
 .env
 default.py
@@ -89,7 +90,6 @@ target/
 env/
 flask_server/config/environment.py
 **/environment.py
-*.egg-info/
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
 #   However, in case of collaboration, if having platform-specific dependencies or dependencies
