@@ -9,14 +9,27 @@
             <input aria-label="destination_name" type="text" name="destination_name" value="{{ destination[1] }}" hidden/>
         <button type="submit">Save Trip</button>
         </form>
-        {% for trip in trips %}
-        <h1> Journey Option {{ loop.index }}: </h1>
+        {% set page_no = page_no + 1 %}
+        <h1> Journey Option {{ page_no }}: </h1>
         <section>
         {% for trip_info, trip_stops in trip.stops.items() %}
         <h2> Journey Leg {{ loop.index }}: </h2>
         <h3> {{ trip_info }} </h3>
             {% for trip_stop in trip_stops %}
-                <p> {{ trip_stop }} </p>
+                {% set stop_name, stop_time = trip_stop %}
+                <p> {{ stop_name }} <b>Arrives: </b> <em> {{ stop_time }} </em></p>
+                <script>
+                    function setMarkers(map) {
+                        for (let i = 0; i < {{ trip.coords|length }}; i++) {
+                            const marker = new google.maps.Marker({
+                                position: {lat: {{ trip.coords }}[i][0], lng: {{ trip.coords }}[i][1] },
+                                map: map,
+                                title: "{{ stop_name }}"
+                            })
+                        };
+                        return {{ trip.coords }};
+                    }
+                </script>
             {% endfor %}
         {% endfor %}
         </section>
@@ -25,6 +38,42 @@
             {% set arrival_day, arrival_time = trip.arrival %}
             <p> <i>{{ depart_day }} - {{ depart_time }} to {{ arrival_day }} - {{ arrival_time }} </i></p>
             <p style="font-size: 15px"> <b>Trip Duration: {{ trip.total_duration }} minutes Cost: {{ trip.total_fare }} </b> </p>
+
         </section>
+            <section>
+            <h4>Map:</h4>
+            <div style="height: 400px" id="map"></div>
+            <script>
+                function initMap() {
+                    const map = new google.maps.Map(document.getElementById('map'), {
+                        center: {lat: -33.8688, lng: 151.2093},
+                        zoom: 10
+                    });
+                    const tripMarkers = setMarkers(map);
+                    const setPathway = tripMarkers.map(path => {
+                        return { lat: path[0], lng: path[1] }
+                    });
+                    const path = new google.maps.Polyline({
+                        path: setPathway,
+                        geodesic: true,
+                        strokeColor: '#0051a1',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
+                    });
+                    path.setMap(map);
+                }
+            </script>
+        </section>
+<nav>
+    {% set pages = pages + 1 %}
+    {% for page in range(1, pages) %}
+        {% set index = page - 1 %}
+        <a href="/trip/journeys?page={{ page|string }}&dest={{ destination[0] }}&origin={{ origin[0] }}&concession_type={{ concession_type}}">
+            {{ page }}
+        </a>
         {% endfor %}
+</nav>
+            <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTqCEEZQTCDwDBCTtfwLTBxHAhrIHLno8&callback=initMap">
+    </script>
     {% endblock %}

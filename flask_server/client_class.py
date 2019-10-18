@@ -50,11 +50,12 @@ class Client:
                 JSON_FORMAT, _type, query, COORDINATE_FORMAT,
                 version=self.version, tf_nswsf=tf_nswsf
             )
-            self.error = 404 if req is None else 200
+            print(req)
+            self.error = 404 if not req.locations else 200
         except ApiException as err:
             print(err)
             req = None
-            self.error = 500
+            self.error = 404
         return req
 
     def find_stops_near_coord(self, *params):
@@ -96,7 +97,7 @@ class Client:
         except ApiException as err:
             print(err)
             req = None
-            self.error = 500
+            self.error = 404
 
         return req
 
@@ -144,7 +145,7 @@ class Client:
         except ApiException as err:
             print(err)
             req = None
-            self.error = 500
+            self.error = 404
         return req
 
     def request_status_info(self, stop, publication_status="current") -> AdditionalInfoResponse:

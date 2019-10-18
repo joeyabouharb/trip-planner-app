@@ -27,7 +27,7 @@ def get_trip_info():
         request.args.get('destType', 'any'),
         request.args.get('dest', '')
     )
-
+    page = int(request.args.get('page', '1')) - 1
     dep = request.args.get('dep', 'dep')
     concession_type = request.args.get('concession_type', 'ADULT')
 
@@ -59,22 +59,27 @@ def get_trip_info():
     if g.client.error == 404:
         return render_template(
             "trip-planner.jinja2", origins=[], destinations=[]
-        )
+        ), 404
+
     origin = next(
         stop_information_generator(
             origin_name.locations, [], ''), False
     )
+
     if g.client.error == 404:
-        return f"{g.client.error}"
+        return render_template(
+            "trip-planner.jinja2", origins=[], destinations=[]
+        ), 404
 
     destination = next(
         stop_information_generator(
             destination_name.locations, [], ''), False
     )
-    trips = trip_journeys_generator(trips.journeys, concession_type)
+
+    trips = list(trip_journeys_generator(trips.journeys, concession_type))
     return render_template(
-        'journeys.jinja2', trips=trips,
-        destination=destination, origin=origin,
+        'journeys.jinja2', trip=trips[page], pages=len(trips), page_no=page,
+        destination=destination, origin=origin, concession_type=concession_type
     )
 
 
@@ -96,12 +101,15 @@ def plan_trip():
     if origin_stop and destination_stop:
 
         origins = g.client.find_stops_by_name('any', origin_stop, True)
+        print(origins)
+        print(g.client.error)
         if g.client.error == 404:
             render_template(
                 "trip-planner.jinja2", origins=[], destinations=[], err=404
             )
 
         destinations = g.client.find_stops_by_name('any', destination_stop, True)
+        print(g.client.error)
         if g.client.error == 404:
             render_template(
                 "trip-planner.jinja2", origins=[], destinations=[], err=404
@@ -135,4 +143,3 @@ def save_journey():
 @TRIP_BLUEPRINT.teardown_request
 def teardown_trips(_):
     g.pop('trips_db', None)
-    print('hello?')

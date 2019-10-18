@@ -3,7 +3,7 @@
     {% block content %}
         <!--suppress ALL -->
         <h2> Search Departures By stop </h2>
-    <div>
+    <section>
         <form method="GET" action="/stops">
             <div style="display: flex">
             <label> Search: <input type="search" name="query"/> </label>
@@ -23,25 +23,30 @@
             <label> Suburb <input name="suburb" type="checkbox"  value="1"/></label>
             <button type="submit"> search </button>
         </form>
-    </div>
-    <section>
+    </section>
+        <section>
         <ul>
-        {% for id, location in data %}
+        {% if not data %}
+            <p>No results Found.</p>
+        {% else %}
+        {% for id, location, geocode in data %}
             <li>
-                {% if id != '' or time != '' %}
+                {% if not time or not date %}
                     <ul><span>{{ location }}</span>
                     <li><a href="/stops/departures/{{ id }}?date={{ date }}&time={{ time }}">Departures</a></li>
                 {% else %}
                     <li><a href="/stops/departures/{{ id }}">Departures</a></li>
                 {% endif %}
                 <li><a href="/stops/status/{{ id }}"> Status Info </a></li>
+                <li>
+                    {% if geocode %}
+                        {% set long, lat = geocode %}
+                    <img src="https://maps.googleapis.com/maps/api/staticmap?center={{ long }},{{ lat }}&zoom=15&size=300x300&markers=color:blue%7Clabel%7Clabel:1%7C{{ long }},{{ lat }}&key=AIzaSyCTqCEEZQTCDwDBCTtfwLTBxHAhrIHLno8"/></li>
+                    {% endif %}
                 </ul>
             </li>
-
         {% endfor %}
-        </ul>
-        {% if not data %}
-            <p> No Results </p>
         {% endif %}
+        </ul>
     </section>
     {% endblock %}

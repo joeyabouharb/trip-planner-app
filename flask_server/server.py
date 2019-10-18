@@ -1,7 +1,7 @@
 """
 Flask server app
-Initialises Flask Server with routes to:
-    - /stop-search
+Initialises Flask server with routes to:
+    - /stops
     - /trips
     - /departures
     - /trip-planner
@@ -10,9 +10,7 @@ Initialises Flask Server with routes to:
 from os import environ
 import sys
 from dotenv import load_dotenv, find_dotenv
-from flask import (
-    Flask, render_template, g
-)
+from flask import Flask, render_template, g
 from flask_server.client_class import Client
 from flask_server.routes.stops import STOP_BLUEPRINT
 from flask_server.routes.trips import TRIP_BLUEPRINT
@@ -38,8 +36,11 @@ def create_client_service():
     g.client = Client(trip_api_key)
 
 
+# trips/ route
 APP.register_blueprint(TRIP_BLUEPRINT)
+# /stop/ route
 APP.register_blueprint(STOP_BLUEPRINT)
+# / route
 APP.register_blueprint(INDEX_BLUEPRINT)
 
 
@@ -60,4 +61,4 @@ def destroy_client(_):
 
 
 if __name__ == '__main__':
-    APP.run(debug=True)
+    APP.run()

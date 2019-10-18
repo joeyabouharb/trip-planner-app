@@ -27,7 +27,7 @@ class TripJourney:
         (
             total_fare, total_duration, summary,
             depart_day, depart_time,
-            arrive_day, arrive_time, stops
+            arrive_day, arrive_time, stops, coords
         ) = args
 
         self.total_fare = total_fare
@@ -36,6 +36,7 @@ class TripJourney:
         self.departure = depart_day, depart_time
         self.arrival = arrive_day, arrive_time
         self.stops = stops
+        self.coords = coords
 
     def __repr__(self):
         """

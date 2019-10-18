@@ -14,7 +14,8 @@ As listed in the requirements text file, this requires:
 
 - Flask
 - datetime module with the dateutils extension
-- auto-generated swagger client for API.  RECOMMENDED :this package served at my github, since my application relies on some modifications: https://github.com/joeyabouharb/opendata-swagger.
+- auto-generated swagger client for API connectivity. This package is served on my github, with some changes which you can view here:
+https://github.com/joeyabouharb/opendata-swagger.
 - python-dotenv to load environmental variables
 - (OPTIONAL) gunicorn as production WSGI Server
 

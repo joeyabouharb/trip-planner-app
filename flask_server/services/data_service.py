@@ -25,7 +25,7 @@ def stop_information_generator(
 ) -> Sequence[tuple]:
     """
     generate information about current stops, filter by suburb and yield
-    mathing stop names
+    matching stop names
     :param locations:
     :param selected_types:
     :param query:
@@ -48,7 +48,7 @@ def stop_information_generator(
             if location.name.split(' ')[-1] != query.capitalize():
                 continue
 
-        yield location.id, location.name
+        yield location.id, location.name, location.coord
 
 
 def date_parser(
@@ -157,33 +157,26 @@ def trip_journeys_generator(
 ) -> Sequence[TripJourney]:
     """
     ## yields trip information from journeys.
-
     Args:
-
     journeys: list -> list of journeys, received from the API Call
 
     Yields:
-
     total_fare: float -> cost of journey,
-
     total_duration: float -> duration (in minutes) of journey,
-
     summary: list -> types of transport used in journey,
-
     depart_day, depart_time: tuple -> (str, str) -> departure day/time information,
-
     arrive_day, arrive_time: tuple -> (str, str) -> arrival day/time information,
-
     stops: dict -> all stops in journey
     """
 
-    def get_stop_info() -> Dict:
+    def get_stop_info() -> (Dict, Sequence[float]):
         """
-        gets stop information in all legs of the current trip journey
-        
-        :return: result as dict
+        gets stop information in all legs of the current trip journey as dictionary
+        as well as the coordinates in the list as coords
+        :return: result, coords
         """
         result = {}
+        coords = []
         type_ = ''
         for leg in legs:
             if leg.stop_sequence is None:
@@ -212,10 +205,12 @@ def trip_journeys_generator(
                 if departure_time != 'Unavailable':
                     # parse dates and return the formatted time string only
                     _, departure_time = create_date_and_time(departure_time, '', '%H:%M')
-                result[type_].append(f'{sequence.name} arrives: {departure_time}')
-        return result
+                coords.append(sequence.coord)
+                result[type_].append((sequence.name, departure_time))
+        return result, coords
     # end of function
-
+    if journeys is None:
+        return []
     for journey in journeys:
         legs = journey.legs
         fares = journey.fare.tickets
@@ -223,11 +218,10 @@ def trip_journeys_generator(
             float(fare.properties.price_total_fare)
             for fare in fares if fare.person == concession_type
         )  # Sum of fare
-
+        total_fare = round(total_fare, 2)
         # calculate total duration in minutes and round up 2 decimal places
         total_duration = sum(leg.duration for leg in legs) / 60
         total_duration = round(total_duration, 2)
-
         summary = [
             VALID_TRANSPORT[leg.transportation.product.icon_id]
             for leg in legs
@@ -238,11 +232,11 @@ def trip_journeys_generator(
 
         arrive = date_parser(legs[-1].destination.arrival_time_estimated)
         arrive_day, arrive_time = create_date_and_time(arrive, '%A,  %d-%m-%Y', '%H:%M%Z')
-        stops = get_stop_info()  # get list of stops in legs as dict
+        stops, coords = get_stop_info()  # get list of stops in legs as dict
         yield TripJourney(
             total_fare, total_duration, summary,
             depart_day, depart_time,
-            arrive_day, arrive_time, stops
+            arrive_day, arrive_time, stops, coords
         )
 
 

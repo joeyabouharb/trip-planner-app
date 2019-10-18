@@ -71,8 +71,15 @@ def get_stop_information():
     """
     date = request.args.get('date', '')
     time = request.args.get("time", '')
-    req = request.args.get('query', False)
+    req = request.args.get('query', '')
     stops = g.client.find_stops_by_name('any', req)
+
+    if g.client.error == 404:
+        return render_template(
+            'stops.jinja2', data=[], selected_type=[],
+            date=False, time=False
+        ), 404
+
     is_suburb = bool(request.args.get('suburb', False))
     selections = [
         int(request.args.get(str(key), False))
@@ -80,10 +87,7 @@ def get_stop_information():
     ]
 
     locations = stops.locations
-    data = (
-        stop_information_generator(locations, selections, req, is_suburb)
-        if req else []
-    )  # return an empty list if no location was returned
+    data = stop_information_generator(locations, selections, req, is_suburb)
     return render_template(
         'stops.jinja2', data=data, selected_type=selections,
         date=date, time=time
