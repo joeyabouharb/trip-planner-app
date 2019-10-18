@@ -48,6 +48,7 @@ jobs:
       - run :
           name: run tests
           command: |
+            source venv/bin/activate
             pylint flask_server/
 
       - store_artifacts:
