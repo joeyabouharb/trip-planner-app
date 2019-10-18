@@ -1,3 +1,6 @@
+"""
+Index / Home Page
+"""
 from flask import Blueprint, g, render_template
 
 from flask_server.services.cache_class import Cache
@@ -7,6 +10,10 @@ INDEX_BLUEPRINT = Blueprint('index', __name__)
 
 @INDEX_BLUEPRINT.before_request
 def load_cache():
+    """
+    load up cache trips cache
+    :return:
+    """
     g.trips_db = Cache('trips')
 
 
@@ -29,4 +36,9 @@ def home():
 
 @INDEX_BLUEPRINT.teardown_request
 def teardown_current_context(_):
+    """
+    delete cache instance after request completion
+    :param _:
+    :return:
+    """
     g.pop('trips_db', None)

@@ -1,15 +1,24 @@
+"""
+/stops route
+"""
 from flask import request, render_template, redirect, Blueprint, g
 
 from flask_server.services.app_locals import VALID_TRANSPORT
 from flask_server.services.cache_class import Cache
-from flask_server.services.data_service import stop_information_generator, departure_info_generator, \
+from flask_server.services.data_service import (
+    stop_information_generator, departure_info_generator,
     status_info_generator
+)
 
 STOP_BLUEPRINT = Blueprint('stops', __name__, url_prefix='/stops')
 
 
 @STOP_BLUEPRINT.before_request
 def create_stop_db():
+    """
+    instantiate cache connection to stops.json (stub)
+    :return:
+    """
     g.stop_db = Cache('stops')
 
 
@@ -56,6 +65,10 @@ def get_status_info(id_):
 
 @STOP_BLUEPRINT.route('/save', methods=['POST'])
 def save_stop():
+    """
+    save stop information into db
+    :return:
+    """
     stop = request.form.get('id', '')
     if stop:
         g.stop_db.write_db(stop)
@@ -83,7 +96,7 @@ def get_stop_information():
     is_suburb = bool(request.args.get('suburb', False))
     selections = [
         int(request.args.get(str(key), False))
-        for key in VALID_TRANSPORT.keys() if int(request.args.get(str(key), False))
+        for key in VALID_TRANSPORT if int(request.args.get(str(key), False))
     ]
 
     locations = stops.locations
@@ -96,4 +109,9 @@ def get_stop_information():
 
 @STOP_BLUEPRINT.teardown_request
 def teardown_stops_db(_):
+    """
+    delete connection to db after request
+    :param _: request context: usually NoneType
+    :return:
+    """
     g.pop('stop_db', None)

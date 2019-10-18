@@ -19,11 +19,13 @@
                     <!--suppress HtmlUnknownTarget -->
                     <form method="GET" action="/trip/journeys">
                             <label>Origins: <select name="origin">
-
+                                {% for id, name, _ in origins %}
+                                <option value="{{ id }}">{{ name }}</option>
+                                {% endfor %}
                             </select></label>
                         <label>Destinations:
                             <select name="dest">
-                        {% for id, name in destinations %}
+                        {% for id, name, _ in destinations %}
                                 <option value="{{ id }}">{{ name }}</option>
                         {% endfor %}
                             </select>

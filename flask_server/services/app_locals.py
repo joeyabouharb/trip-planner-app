@@ -8,7 +8,8 @@ VALID_EXCLUSIONS = {
 }
 
 VALID_TRANSPORT = {
-    1: 'trains', 4: 'light_rail', 5: 'bus', 7: 'coach', 9: 'ferry', 11: 'school_bus', 99: 'walk', 100: 'walk'
+    1: 'trains', 4: 'light_rail', 5: 'bus', 7: 'coach', 9: 'ferry',
+    11: 'school_bus', 99: 'walk', 100: 'walk'
 }
 
 VALID_PERSONS = ['ADULT', 'CHILD', 'SENIOR', 'SCHOLAR', ]

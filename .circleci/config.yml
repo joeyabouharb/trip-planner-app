@@ -45,6 +45,10 @@ jobs:
       # other common Python testing frameworks include pytest and nose
       # https://pytest.org
       # https://nose.readthedocs.io
+      - run :
+          name: run tests
+          command: |
+            find flask_server/* -iname "*.py" | xargs pylint
 
       - store_artifacts:
           path: test-reports

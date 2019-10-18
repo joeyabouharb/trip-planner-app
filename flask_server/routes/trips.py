@@ -1,3 +1,6 @@
+"""
+/trips route
+"""
 from flask import request, render_template, Blueprint, g, redirect
 
 from flask_server.services.cache_class import Cache
@@ -8,6 +11,10 @@ TRIP_BLUEPRINT = Blueprint('trips', __name__, url_prefix='/trip')
 
 @TRIP_BLUEPRINT.before_request
 def load_trips():
+    """
+    instantiate trips cache
+    :return:
+    """
     g.trip_db = Cache('trips')
 
 
@@ -142,4 +149,9 @@ def save_journey():
 
 @TRIP_BLUEPRINT.teardown_request
 def teardown_trips(_):
+    """
+    remove trips database instance after request completion
+    :param _:
+    :return:
+    """
     g.pop('trips_db', None)

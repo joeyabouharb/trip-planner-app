@@ -1,4 +1,3 @@
-
 """
 handles yielding/returning meaningful data to client by
 filtering/mapping through data like stop information, departures and journey info
@@ -88,31 +87,24 @@ def departure_info_generator(
 ) -> Sequence[DepartureInfo]:
     """## Generate departure information for a stop
     args
-
     :arg: `events`: `DepartureMonitorResponse` -> stop events for a specified location
-
     :arg: `of_type`: str -> specified stop type ID to filter. as defined in the API docs
-
     yields:
 
     :return DepartureInfo
     """
 
     for event in events.stop_events:
-        transport_type = event.transportation.product.icon_id
-        transportation = event.transportation
-        route = transportation.number
-        dest = transportation.destination.name
+        route = event.transportation.number
+        dest = event.transportation.destination.name
         location = event.location.name
         id_ = event.location.id
-        type_ = VALID_TRANSPORT[transport_type]
         departure_time = event.departure_time_planned
         parsed_date = date_parser(departure_time)
         # ensure datetime is formatted with timezone info
         # convert date to AEST
         if date_time is None:
-            planned_date = datetime.now(tz.tzlocal())
-            planned_date = planned_date.astimezone(tz=tz.gettz('Australia/Sydney'))
+            planned_date = datetime.now(tz.tzlocal()).astimezone(tz=tz.gettz('Australia/Sydney'))
         else:
             planned_date = datetime.strptime(
                 f'{date_time[0]} {date_time[1]}', '%Y/%m/%d %I:%M%p'
@@ -127,7 +119,7 @@ def departure_info_generator(
         hours, remainder = countdown.seconds // 3600, countdown.seconds % 3600
         # decide remainder by 60 remainder which will be seconds
         minutes, seconds = remainder // 60, remainder % 60
-        yield DepartureInfo(hours, minutes, seconds, route, dest, location, type_, id_)
+        yield DepartureInfo(hours, minutes, seconds, route, dest, location, id_)
 
 
 def create_date_and_time(
@@ -152,6 +144,48 @@ def create_date_and_time(
     return today, time
 
 
+def get_stop_info(legs) -> (Dict, Sequence[float]):
+    """
+    gets stop information in all legs of the current trip journey as dictionary
+    as well as the coordinates in the list as coords
+    :return: result, coords
+    """
+    result = {}
+    coords = []
+    type_ = ''
+    for leg in legs:
+        if leg.stop_sequence is None:
+            continue
+        for seq_num, sequence in enumerate(leg.stop_sequence):
+            if seq_num == 0:
+                # create new key entry for each leg/ network change in journey
+                # Note that the Api returns None when it means a walking trip
+                type_ = (
+                    leg.transportation.name
+                    if leg.transportation.name is not None else 'Walking'
+                )
+                result[type_] = []
+
+            # attempt to get live updates/ estimated otherwise get planned dep/arrival times
+            if sequence.departure_time_estimated is not None:
+                departure_time = date_parser(sequence.departure_time_estimated)
+            elif sequence.arrival_time_estimated is not None:
+                departure_time = date_parser(sequence.arrival_time_estimated)
+            elif sequence.departure_time_planned is not None:
+                departure_time = date_parser(sequence.departure_time_planned)
+            elif sequence.arrival_time_planned is not None:
+                departure_time = date_parser(sequence.arrival_time_planned)
+            else:
+                # if no information is available output message:
+                departure_time = 'Unavailable'
+            if departure_time != 'Unavailable':
+                # parse dates and return the formatted time string only
+                _, departure_time = create_date_and_time(departure_time, '', '%H:%M')
+            coords.append(sequence.coord)
+            result[type_].append((sequence.name, departure_time))
+    return result, coords
+
+
 def trip_journeys_generator(
         journeys: Sequence[TripRequestResponseJourney], concession_type: str
 ) -> Sequence[TripJourney]:
@@ -168,51 +202,7 @@ def trip_journeys_generator(
     arrive_day, arrive_time: tuple -> (str, str) -> arrival day/time information,
     stops: dict -> all stops in journey
     """
-
-    def get_stop_info() -> (Dict, Sequence[float]):
-        """
-        gets stop information in all legs of the current trip journey as dictionary
-        as well as the coordinates in the list as coords
-        :return: result, coords
-        """
-        result = {}
-        coords = []
-        type_ = ''
-        for leg in legs:
-            if leg.stop_sequence is None:
-                continue
-            for seq_num, sequence in enumerate(leg.stop_sequence):
-                if seq_num == 0:
-                    # create new key entry for each leg/ network change in journey
-                    type_ = (
-                        leg.transportation.name
-                        if leg.transportation.name is not None else 'Walking'  # trip is walk if None
-                    )
-                    result[type_] = []
-
-                # attempt to get live updates/ estimated otherwise get planned dep/arrival times
-                if sequence.departure_time_estimated is not None:
-                    departure_time = date_parser(sequence.departure_time_estimated)
-                elif sequence.arrival_time_estimated is not None:
-                    departure_time = date_parser(sequence.arrival_time_estimated)
-                elif sequence.departure_time_planned is not None:
-                    departure_time = date_parser(sequence.departure_time_planned)
-                elif sequence.arrival_time_planned is not None:
-                    departure_time = date_parser(sequence.arrival_time_planned)
-                else:
-                    # if no information is available output message:
-                    departure_time = 'Unavailable'
-                if departure_time != 'Unavailable':
-                    # parse dates and return the formatted time string only
-                    _, departure_time = create_date_and_time(departure_time, '', '%H:%M')
-                coords.append(sequence.coord)
-                result[type_].append((sequence.name, departure_time))
-        return result, coords
-    # end of function
-    if journeys is None:
-        return []
     for journey in journeys:
-        legs = journey.legs
         fares = journey.fare.tickets
         total_fare = sum(
             float(fare.properties.price_total_fare)
@@ -220,19 +210,19 @@ def trip_journeys_generator(
         )  # Sum of fare
         total_fare = round(total_fare, 2)
         # calculate total duration in minutes and round up 2 decimal places
-        total_duration = sum(leg.duration for leg in legs) / 60
+        total_duration = sum(leg.duration for leg in journey.legs) / 60
         total_duration = round(total_duration, 2)
         summary = [
             VALID_TRANSPORT[leg.transportation.product.icon_id]
-            for leg in legs
+            for leg in journey.legs
         ]
 
-        depart = date_parser(legs[0].origin.departure_time_estimated)
+        depart = date_parser(journey.legs[0].origin.departure_time_estimated)
         depart_day, depart_time = create_date_and_time(depart, '%A,  %d-%m-%Y', '%H:%M%Z')
 
-        arrive = date_parser(legs[-1].destination.arrival_time_estimated)
+        arrive = date_parser(journey.legs[-1].destination.arrival_time_estimated)
         arrive_day, arrive_time = create_date_and_time(arrive, '%A,  %d-%m-%Y', '%H:%M%Z')
-        stops, coords = get_stop_info()  # get list of stops in legs as dict
+        stops, coords = get_stop_info(journey.legs)  # get list of stops in legs as dict
         yield TripJourney(
             total_fare, total_duration, summary,
             depart_day, depart_time,
@@ -246,8 +236,7 @@ def status_info_generator(current_infos: Sequence[AdditionalInfoResponseMessage]
     :param current_infos:
     :return: tuple( priority, title, content, from_time, to )
     """
-    if current_infos is None:
-        return False
+
     for message in current_infos:
         title = message.subtitle
         content = message.content
@@ -256,7 +245,7 @@ def status_info_generator(current_infos: Sequence[AdditionalInfoResponseMessage]
         from_time = date_parser(timestamp.creation)
         date, time = create_date_and_time(from_time, "%Y-%m-%d", "%H:%M")
         from_time = f'{date} {time}'
-        to = date_parser(timestamp.validity[-1].to)
-        date, time = create_date_and_time(to, "%Y-%m-%d", "%H:%M")
-        to = f'{date} {time}'
-        yield priority, title, content, from_time, to
+        to_date = date_parser(timestamp.validity[-1].to)
+        date, time = create_date_and_time(to_date, "%Y-%m-%d", "%H:%M")
+        to_date = f'{date} {time}'
+        yield priority, title, content, from_time, to_date

@@ -1,3 +1,6 @@
+"""
+contains definition to our cache class (json stub file)
+"""
 from pathlib import Path
 import json
 
@@ -29,8 +32,8 @@ class Cache:
             self.read_db()
             self.data.append(data)
         try:
-            with open(self.filename, 'w+') as db:
-                json.dump(self.data, db, indent=2)
+            with open(self.filename, 'w+') as database:
+                json.dump(self.data, database, indent=2)
         except json.JSONDecodeError as err:
             raise err
 
@@ -39,6 +42,6 @@ class Cache:
         read our database and store the results in our class object
         :return:
         """
-        with open(self.filename, 'r') as db:
-            data = json.load(db)
+        with open(self.filename, 'r') as database:
+            data = json.load(database)
         self.data = data
