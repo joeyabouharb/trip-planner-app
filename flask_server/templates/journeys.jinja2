@@ -3,10 +3,10 @@
     {% block content %}
         <!--suppress HtmlUnknownTarget -->
         <form action="/trip/save" method="POST">
-           <input aria-label="origin" type="text" name="origin" value="{{ origin[0] }}" hidden/>
-            <input aria-label="origin_name" type="text" name="origin_name" value="{{ origin[1] }}" hidden />
-            <input aria-label="destination" type="text" name="destination" value="{{ destination[0] }}" hidden/>
-            <input aria-label="destination_name" type="text" name="destination_name" value="{{ destination[1] }}" hidden/>
+           <input aria-label="origin_id" type="text" name="origin_id" value="{{ origin }}" hidden/>
+            <input aria-label="destination_id" type="text" name="destination_id" value="{{ destination }}" hidden/>
+            <input aria-label="origin_name" type="text" name="origin_name" value="{{ trip.origin }}" hidden/>
+            <input aria-label="destination_name" type="text" name="destination_name" value="{{ trip.destination }}" hidden/>
         <button type="submit">Save Trip</button>
         </form>
         {% set page_no = page_no + 1 %}

@@ -1,3 +1,14 @@
 {
-  "trips": []
+  "trips": [
+    [
+      [
+        "poiID:858268243:95314005:-1:Five Dock Bay:Chiswick:Five Dock Bay:ANY:POI:4883465:3753109:GDAV:nsw",
+        "Five Dock Bay, Chiswick"
+      ],
+      [
+        "streetID:1500000051::95301027:-1:Belmore Lane:Surry Hills:Belmore Lane::Belmore Lane: 2010:ANY:DIVA_STREET:4889585:3757318:GDAV:nsw",
+        "Belmore Lane, Surry Hills"
+      ]
+    ]
+  ]
 }

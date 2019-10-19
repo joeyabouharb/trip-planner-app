@@ -103,13 +103,13 @@ def save_journey():
     save a journey by name
     :return:
     """
-    destination = request.form.get('destination', ''), request.form.get('destination_name', '')
-    origin = request.form.get('origin', ''), request.form.get('origin_name', '')
+    destination = request.form.get('destination_id', ''), request.form.get('destination_name', '')
+    origin = request.form.get('origin_id', ''), request.form.get('origin_name', '')
     if '' not in destination or '' not in origin:
         trip_db: Cache = g.trip_db
         trip_db.read_db()
-        if (origin, destination) in g.trip_db.data:
-            g.trip_db.write_db((origin, destination))
+        trip_db.write_db((origin, destination))
+        print(trip_db.data)
     return redirect('/')
 
 
