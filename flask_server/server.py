@@ -58,7 +58,7 @@ def destroy_client(_):
     """
     destroy client object after request is handled
     """
-    g.pop('client')
+    g.pop('client', None)
 
 
 if __name__ == '__main__':
