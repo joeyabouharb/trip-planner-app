@@ -1,5 +1,8 @@
 {
-  "data": {
-    "stops": []
-  }
+  "stops": [
+    [
+      "streetID:1500000051::95301027:-1:Belmore Lane:Surry Hills:Belmore Lane::Belmore Lane: 2010:ANY:DIVA_STREET:4889585:3757318:GDAV:nsw",
+      "Belmore Lane, Surry Hills"
+    ]
+  ]
 }

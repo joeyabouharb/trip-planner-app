@@ -3,12 +3,13 @@
     {% block content %}
     <h2> Dashboard </h2>
     <div>
+        <h3>Trips</h3>
     {% for trip in trips %}
          {% set origin, destination = trip %}
         {% set origin_id, origin_name = origin %}
         {% set destination_id, destination_name = destination %}
-        <p>
 
+        <p>
             <!--suppress HtmlUnknownTarget -->
             <a
                         href="/trip/journeys?origin={{ origin_id }}&dest={{ destination_id }}"
@@ -17,8 +18,24 @@
                 </a>
         </p>
     {% endfor %}
+    <h3>stops</h3>
+    {% for stop in stops %}
+    {% set id, name = stop %}
+        <ul>
+            <li>{{ name }}</li>
+            <li>
+                <ul>
+                    <li> <a href="/stops/departures/{{ id }}"> Departures </a></li>
+                    <li> <a href="/stops/status/{{ id }}"> Status </a> </li>
+                </ul>
+            </li>
+        </ul>
+    {% endfor %}
     {% if not trips %}
         <p>No Trips saved!</p>
+    {% endif %}
+    {% if not stops %}
+            <p>No Trips saved!</p>
     {% endif %}
     </div>
     {% endblock %}

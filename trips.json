@@ -1,16 +1,3 @@
 {
-  "data": {
-    "trips": [
-      [
-        [
-          "10101397",
-          "Belmore Station, Belmore"
-        ],
-        [
-          "10101112",
-          "North Sydney Station, North Sydney"
-        ]
-      ]
-    ]
-  }
+  "trips": []
 }

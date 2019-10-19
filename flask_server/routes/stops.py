@@ -42,7 +42,6 @@ def get_departures(id_: str):
     )
     if client.error == 404:
         return render_template("404.jinja2")
-
     departures_info = departure_info_generator(departures, date_time)
     sorted_departures = {}
     for departure in departures_info:
@@ -50,8 +49,10 @@ def get_departures(id_: str):
         if not location_key:
             sorted_departures[departure.location] = []
         sorted_departures[departure.location].append(departure)
+    name = client.find_stops_by_name('any', id_, is_id=True).locations[0].name
+
     return render_template(
-        "departures.jinja2", departures_info=sorted_departures, id=id_
+        "departures.jinja2", departures_info=sorted_departures, id=id_, name=name
     )
 
 
@@ -62,7 +63,11 @@ def get_status_info(id_):
     :param id_:
     :return: View
     """
-    statuses = g.client.request_status_info(id_).infos.current
+    client: Client = g.client
+    statuses = client.request_status_info(id_).infos.current
+    if client.error == 404:
+        return render_template('statuses.jinja2', statuses=[])
+
     statuses = status_info_generator(statuses)
     return render_template('statuses.jinja2', statuses=statuses)
 
@@ -73,9 +78,9 @@ def save_stop():
     save stop information into db
     :return:
     """
-    stop = request.form.get('id', '')
-    if stop:
-        g.stop_db.write_db(stop)
+    stop_id, stop_name = request.form.get('id', ''), request.form.get('name', '')
+    if stop_id and stop_name:
+        g.stop_db.write_db((stop_id, stop_name))
     return redirect('/')
 
 

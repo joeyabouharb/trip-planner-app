@@ -10,6 +10,7 @@ from swagger_client.models.additional_info_response import AdditionalInfoRespons
 from swagger_client.models.departure_monitor_response import DepartureMonitorResponse
 from swagger_client.models.stop_finder_response import StopFinderResponse
 from swagger_client.models.trip_request_response import TripRequestResponse
+from swagger_client.rest import ApiException
 from urllib3.util.retry import MaxRetryError
 import flask_server.services.swagger_instance as instance
 from flask_server.services.app_locals import JSON_FORMAT, COORDINATE_FORMAT
@@ -56,6 +57,10 @@ class Client:
             print(err)
             self.data = None
             self.error = 404
+        except ApiException as err:
+            print(err)
+            self.data = None
+            self.error = 404
         return self.data
 
     def find_stops_near_coord(self, *params):
@@ -94,11 +99,15 @@ class Client:
                 mode='direct', tf_nswdm="true", version=self.version
             )
             self.error = 404 if req.stop_events is None else 200
+            self.data = req
         except MaxRetryError as err:
             print(err)
-            req = None
+            self.data = None
             self.error = 404
-        self.data = req
+        except ApiException as err:
+            print(err)
+            self.data = None
+            self.error = 404
         return self.data
 
     def find_trips_for_stop(
@@ -142,19 +151,33 @@ class Client:
                 version=self.version
             )
             self.error = 404 if req.journeys is None else 200
+            self.data = req
         except MaxRetryError as err:
             print(err)
-            req = None
+            self.data = None
             self.error = 404
-        self.data = req
-        return req
+        except ApiException as err:
+            print(err)
+            self.data = None
+            self.error = 404
+        return self.data
 
     def request_status_info(self, stop, publication_status="current") -> AdditionalInfoResponse:
         """
         find detailed status reports on potential, train works, delays for specified stops.
         """
-        req = self._instance.tfnsw_addinfo_request(
-            JSON_FORMAT, itd_l_pxx_sel_stop=stop, filter_publication_status=publication_status
-        )
-        self.data = req
+        try:
+            req = self._instance.tfnsw_addinfo_request(
+                JSON_FORMAT, itd_l_pxx_sel_stop=stop, filter_publication_status=publication_status
+            )
+            self.data = req
+            self.error = 404 if req.infos.current is None else 404
+        except MaxRetryError as err:
+            print(err)
+            self.data = None
+            self.error = 404
+        except ApiException as err:
+            print(err)
+            self.data = None
+            self.error = 404
         return self.data

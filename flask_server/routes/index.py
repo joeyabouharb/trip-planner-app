@@ -36,7 +36,11 @@ def home():
             error="Connection to API Failed."
         ), 404
 
-    return render_template('index.jinja2', trips=trips_db.data, stops=stops_db.data)
+    return render_template(
+        'index.jinja2',
+        trips=trips_db.data[trips_db.key],
+        stops=stops_db.data[stops_db.key]
+    )
 
 
 @INDEX_BLUEPRINT.teardown_request
