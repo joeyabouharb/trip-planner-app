@@ -38,13 +38,21 @@ def get_trip_info():
     )
     page = int(request.args.get('page', '1')) - 1
     dep = request.args.get('dep', 'dep')  # enable user to query departure or arrival times
+    date = request.args.get('date', '')
+    time = request.args.get('time', '')
     concession_type = request.args.get('concession_type', 'ADULT')
 
     client: Client = g.client
-
-    trips = client.find_trips_for_stop(
-        (type_origin, origin), (type_dest, destination), dep
-    )
+    if not date or not time:
+        trips = client.find_trips_for_stop(
+            (type_origin, origin), (type_dest, destination), dep
+        )
+    else:
+        trips = client.find_trips_for_stop(
+            (type_origin, origin), (type_dest, destination), dep, date_time=(date, time)
+        )
+        print(date, time)
+        print(trips)
     if client.error == 404:
         return render_template("404.jinja2"), 404
 

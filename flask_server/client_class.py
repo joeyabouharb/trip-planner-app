@@ -130,20 +130,23 @@ class Client:
         - `wheelchair`: str -> default set to 'off'
         set 'on' to return wheelchair accessible options
         """
+        format_date = '%Y%m%d'
+        format_time = '%H%M'
         departure, destination, dep = args
+        if not kwargs.get('date_time', False):
+            date_time = datetime.now(tz.tzlocal()).astimezone(tz=tz.gettz('Australia/Sydney'))
+            # format datetime to a string
+            date_str, time = create_date_and_time(date_time, format_date, format_time)
+        else:
+            date_str, time = kwargs['date_time']
+            date_time = datetime.strptime(f'{date_str} {time}', '%Y-%m-%d %I:%M%p')
+            if date_time:
+                date_str, time = create_date_and_time(date_time, format_date, format_time)
 
-        date_time = (
-            datetime.now(tz.tzlocal()).astimezone(tz=tz.gettz('Australia/Sydney'))
-            if not kwargs.get('date_time', False) else kwargs['date_time']
-        )
         calc_number_of_trips = (
             5 if not kwargs.get('calc_number_of_trips', False)
             else kwargs['calc_number_of_trips']
         )
-        # format datetime to a string
-        format_date = '%Y%m%d'
-        format_time = '%H%M'
-        date_str, time = create_date_and_time(date_time, format_date, format_time)
         try:
             req = self._instance.tfnsw_trip_request2(
                 JSON_FORMAT, COORDINATE_FORMAT, dep, date_str, time, *departure,
