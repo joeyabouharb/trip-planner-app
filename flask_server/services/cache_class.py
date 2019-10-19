@@ -16,6 +16,7 @@ class Cache:
     """
     def __init__(self, filename):
         self.filename = filename + '.json'
+        self.key = filename
         self.data = {
             "trips": []
         }
@@ -46,4 +47,4 @@ class Cache:
         """
         with open(self.filename, 'r') as database:
             data = json.load(database)
-        self.data = data["data"]["trips"]
+        self.data = data["data"][self.key]

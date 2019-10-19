@@ -1,5 +1,5 @@
 {% extends "layout.jinja2" %}
-{% block title %} Options for: {{ origin[1] }} to {{ destination[1] }}:{% endblock %}
+{% block title %} Options for: {{ trip.origin }} to {{ trip.destination }}:{% endblock %}
     {% block content %}
         <!--suppress HtmlUnknownTarget -->
         <form action="/trip/save" method="POST">
@@ -36,8 +36,7 @@
 <nav>
     {% set pages = pages + 1 %}
     {% for page in range(1, pages) %}
-        {% set index = page - 1 %}
-        <a href="/trip/journeys?page={{ page|string }}&dest={{ destination[0] }}&origin={{ origin[0] }}&concession_type={{ concession_type}}">
+        <a href="/trip/journeys?page={{ page|string }}&dest={{ destination }}&origin={{ origin }}&concession_type={{ concession_type}}">
             {{ page }}
         </a>
         {% endfor %}

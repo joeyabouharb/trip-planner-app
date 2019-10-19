@@ -9,6 +9,7 @@ from flask_server.services.data_service import (
     stop_information_generator, departure_info_generator,
     status_info_generator
 )
+from flask_server.client_class import Client
 
 STOP_BLUEPRINT = Blueprint('stops', __name__, url_prefix='/stops')
 
@@ -27,6 +28,8 @@ def get_departures(id_: str):
     """
     get departures for a certain stop ID
     """
+    client: Client = g.client
+
     date = request.args.get('date', '')
     time = request.args.get("time", '')
     if not date or not time:
@@ -34,12 +37,13 @@ def get_departures(id_: str):
     else:
         date_time = (date, time)
     expected_type = request.args.get('expected_type', 'dep')
-    departures = g.client.find_destinations_for(
+    departures = client.find_destinations_for(
         'any', id_, expected_type, date_time=date_time
     )
+    if client.error == 404:
+        return render_template("404.jinja2")
 
-    departures_info = departure_info_generator(departures, date_time) \
-        if departures.stop_events is not None else []
+    departures_info = departure_info_generator(departures, date_time)
     sorted_departures = {}
     for departure in departures_info:
         location_key = sorted_departures.get(departure.location, False)
@@ -82,18 +86,20 @@ def get_stop_information():
     returns a list of stops from entered key words
     :return:
     """
+    client: Client = g.client
+
     date = request.args.get('date', '')
     time = request.args.get("time", '')
     req = request.args.get('query', '')
-    stops = g.client.find_stops_by_name('any', req)
+    stops = client.find_stops_by_name('any', req)
 
-    if g.client.error == 404:
+    if client.error == 404:
         return render_template(
             'stops.jinja2', data=[], selected_type=[],
             date=False, time=False
         ), 404
 
-    is_suburb = bool(request.args.get('suburb', False))
+    is_suburb = bool(request.args.get('suburb', False))  # convert input to boolean
     selections = [
         int(request.args.get(str(key), False))
         for key in VALID_TRANSPORT if int(request.args.get(str(key), False))

@@ -29,6 +29,7 @@ class Client:
         # start up swagger client instance upon initialisation
         self._instance = instance.start(key)
         self.error = None
+        self.data = None
         self.version = '10.2.1.42'  # stable version
 
     def find_stops_by_name(
@@ -49,13 +50,13 @@ class Client:
                 JSON_FORMAT, _type, query, COORDINATE_FORMAT,
                 version=self.version, tf_nswsf=tf_nswsf
             )
-            print(req)
+            self.data = req
             self.error = 404 if not req.locations else 200
         except MaxRetryError as err:
             print(err)
-            req = None
+            self.data = None
             self.error = 404
-        return req
+        return self.data
 
     def find_stops_near_coord(self, *params):
         """
@@ -97,8 +98,8 @@ class Client:
             print(err)
             req = None
             self.error = 404
-
-        return req
+        self.data = req
+        return self.data
 
     def find_trips_for_stop(
             self, *args, **kwargs
@@ -145,6 +146,7 @@ class Client:
             print(err)
             req = None
             self.error = 404
+        self.data = req
         return req
 
     def request_status_info(self, stop, publication_status="current") -> AdditionalInfoResponse:
@@ -154,4 +156,5 @@ class Client:
         req = self._instance.tfnsw_addinfo_request(
             JSON_FORMAT, itd_l_pxx_sel_stop=stop, filter_publication_status=publication_status
         )
-        return req
+        self.data = req
+        return self.data

@@ -25,18 +25,20 @@ class TripJourney:
     def __init__(self, *args):
 
         (
-            total_fare, total_duration, summary,
+            total_fare, total_duration,
             depart_day, depart_time,
-            arrive_day, arrive_time, stops, coords
+            arrive_day, arrive_time, stops, coords,
+            origin, destination
         ) = args
 
         self.total_fare = total_fare
         self.total_duration = total_duration
-        self.summary = summary
         self.departure = depart_day, depart_time
         self.arrival = arrive_day, arrive_time
         self.stops = stops
         self.coords = coords
+        self.origin = origin
+        self.destination = destination
 
     def __repr__(self):
         """
@@ -53,8 +55,6 @@ class TripJourney:
             f'{trip_str}'
             f"{depart_day} - {depart_time}" ' to ' f"{arrive_day} - {arrive_time}\n"
             f' Trip Duration: {self.total_duration} minutes Cost: {self.total_fare}\n'
-            "transport used: "
-            " -> ".join(self.summary)
         )
 
     def to_dict(self):

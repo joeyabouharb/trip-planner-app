@@ -4,6 +4,7 @@ Index / Home Page
 from flask import Blueprint, g, render_template
 
 from flask_server.services.cache_class import Cache
+from flask_server.client_class import Client
 
 INDEX_BLUEPRINT = Blueprint('index', __name__)
 
@@ -15,6 +16,7 @@ def load_cache():
     :return:
     """
     g.trips_db = Cache('trips')
+    g.stops_db = Cache('stops')
 
 
 @INDEX_BLUEPRINT.route('/')
@@ -22,16 +24,19 @@ def home():
     """## Home Page Route
     Dashboard with sitemap
     """
-    trips_db = g.trips_db
-    trips_db.read_db()
+    trips_db: Cache = g.trips_db
+    stops_db: Cache = g.stops_db
+    client: Client = g.client
 
-    if g.client.error in [500, 404]:
+    trips_db.read_db()
+    stops_db.read_db()
+    if client.error == 404:
         return render_template(
             'index.jinja2', trips=[], names=[],
             error="Connection to API Failed."
         ), 404
 
-    return render_template('index.jinja2', trips=trips_db.data)
+    return render_template('index.jinja2', trips=trips_db.data, stops=stops_db.data)
 
 
 @INDEX_BLUEPRINT.teardown_request

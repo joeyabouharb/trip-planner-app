@@ -3,8 +3,10 @@
 """
 from flask import request, render_template, Blueprint, g, redirect
 
+from flask_server.client_class import Client
 from flask_server.services.cache_class import Cache
 from flask_server.services.data_service import trip_journeys_generator, stop_information_generator
+
 
 TRIP_BLUEPRINT = Blueprint('trips', __name__, url_prefix='/trip')
 
@@ -35,55 +37,19 @@ def get_trip_info():
         request.args.get('dest', '')
     )
     page = int(request.args.get('page', '1')) - 1
-    dep = request.args.get('dep', 'dep')
+    dep = request.args.get('dep', 'dep')  # enable user to query departure or arrival times
     concession_type = request.args.get('concession_type', 'ADULT')
 
-    if not origin:
-        return render_template(
-            "trip-planner.jinja2", origins=[], destinations=[]
-        )
+    client: Client = g.client
 
-    if not destination:
-        return render_template(
-            "trip-planner.jinja2", origins=[], destinations=[],
-        )
-
-    trips = g.client.find_trips_for_stop(
+    trips = client.find_trips_for_stop(
         (type_origin, origin), (type_dest, destination), dep
     )
-
-    origin_name = g.client.find_stops_by_name(
-        'any', origin
-    )
-
-    if g.client.error == 404:
-        return render_template(
-            "trip-planner.jinja2", origins=[], destinations=[]
-        )
-
-    destination_name = g.client.find_stops_by_name('any', destination)
-
-    if g.client.error == 404:
-        return render_template(
-            "trip-planner.jinja2", origins=[], destinations=[]
-        ), 404
-
-    origin = next(
-        stop_information_generator(
-            origin_name.locations, [], ''), False
-    )
-
-    if g.client.error == 404:
-        return render_template(
-            "trip-planner.jinja2", origins=[], destinations=[]
-        ), 404
-
-    destination = next(
-        stop_information_generator(
-            destination_name.locations, [], ''), False
-    )
+    if client.error == 404:
+        return render_template("404.jinja2"), 404
 
     trips = list(trip_journeys_generator(trips.journeys, concession_type))
+
     return render_template(
         'journeys.jinja2', trip=trips[page], pages=len(trips), page_no=page,
         destination=destination, origin=origin, concession_type=concession_type
@@ -104,18 +70,17 @@ def plan_trip():
     dest_is_suburb = request.args.get('dest_suburb', False)
     origin_is_suburb = bool(origin_is_suburb)
     dest_is_suburb = bool(dest_is_suburb)
-
     if origin_stop and destination_stop:
+        client: Client = g.client
+        origins = client.find_stops_by_name('any', origin_stop, True)
 
-        origins = g.client.find_stops_by_name('any', origin_stop, True)
-
-        if g.client.error == 404:
+        if client.error == 404:
             render_template(
                 "trip-planner.jinja2", origins=[], destinations=[], err=404
             )
 
-        destinations = g.client.find_stops_by_name('any', destination_stop, True)
-        if g.client.error == 404:
+        destinations = client.find_stops_by_name('any', destination_stop, True)
+        if client.error == 404:
             render_template(
                 "trip-planner.jinja2", origins=[], destinations=[], err=404
             )
@@ -141,7 +106,8 @@ def save_journey():
     destination = request.form.get('destination', ''), request.form.get('destination_name', '')
     origin = request.form.get('origin', ''), request.form.get('origin_name', '')
     if '' not in destination or '' not in origin:
-        g.trip_db.read_db()
+        trip_db: Cache = g.trip_db
+        trip_db.read_db()
         if (origin, destination) in g.trip_db.data:
             g.trip_db.write_db((origin, destination))
     return redirect('/')

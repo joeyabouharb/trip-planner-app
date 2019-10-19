@@ -15,7 +15,6 @@ from swagger_client.models import (
 
 from flask_server.models.departure_info import DepartureInfo
 from flask_server.models.trip_journey import TripJourney
-from flask_server.services.app_locals import VALID_TRANSPORT
 
 
 def stop_information_generator(
@@ -212,11 +211,7 @@ def trip_journeys_generator(
         # calculate total duration in minutes and round up 2 decimal places
         total_duration = sum(leg.duration for leg in journey.legs) / 60
         total_duration = round(total_duration, 2)
-        summary = [
-            VALID_TRANSPORT[leg.transportation.product.icon_id]
-            for leg in journey.legs
-        ]
-
+        origin, dest = journey.legs[0].origin.name, journey.legs[-1].destination.name
         depart = date_parser(journey.legs[0].origin.departure_time_estimated)
         depart_day, depart_time = create_date_and_time(depart, '%A,  %d-%m-%Y', '%H:%M%Z')
 
@@ -224,9 +219,9 @@ def trip_journeys_generator(
         arrive_day, arrive_time = create_date_and_time(arrive, '%A,  %d-%m-%Y', '%H:%M%Z')
         stops, coords = get_stop_info(journey.legs)  # get list of stops in legs as dict
         yield TripJourney(
-            total_fare, total_duration, summary,
+            total_fare, total_duration,
             depart_day, depart_time,
-            arrive_day, arrive_time, stops, coords
+            arrive_day, arrive_time, stops, coords, origin, dest
         )
 
 
