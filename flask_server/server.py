@@ -10,7 +10,6 @@ Initialises Flask server with routes to:
 from os import environ
 import sys
 from dotenv import load_dotenv, find_dotenv
-from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, g
 from flask_server.client_class import Client
 from flask_server.routes.stops import STOP_BLUEPRINT
