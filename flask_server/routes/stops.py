@@ -52,7 +52,8 @@ def get_departures(id_: str):
     name = client.find_stops_by_name('any', id_, is_id=True).locations[0].name
 
     return render_template(
-        "departures.jinja2", departures_info=sorted_departures, id=id_, name=name
+        "departures.jinja2", departures_info=sorted_departures, id=id_, name=name,
+        date_time=date_time
     )
 
 

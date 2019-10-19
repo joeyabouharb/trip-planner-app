@@ -100,13 +100,14 @@ def departure_info_generator(
         id_ = event.location.id
         departure_time = event.departure_time_planned
         parsed_date = date_parser(departure_time)
+        print(parsed_date)
         # ensure datetime is formatted with timezone info
         # convert date to AEST
         if date_time is None:
             planned_date = datetime.now(tz.tzlocal()).astimezone(tz=tz.gettz('Australia/Sydney'))
         else:
             planned_date = datetime.strptime(
-                f'{date_time[0]} {date_time[1]}', '%Y/%m/%d %I:%M%p'
+                f'{date_time[0]} {date_time[1]}', '%Y-%m-%d %I:%M%p'
             ).replace(tzinfo=tz.gettz('AEST'))
         countdown = parsed_date - planned_date
         # if the train has already passed skip to next data set

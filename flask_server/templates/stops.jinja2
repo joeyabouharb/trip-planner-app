@@ -31,11 +31,11 @@
         {% else %}
         {% for id, location, geocode in data %}
             <li>
-                {% if not time or not date %}
+                {% if date is none or time is none %}
                     <ul><span>{{ location }}</span>
-                    <li><a href="/stops/departures/{{ id }}?date={{ date }}&time={{ time }}">Departures</a></li>
-                {% else %}
                     <li><a href="/stops/departures/{{ id }}">Departures</a></li>
+                {% else %}
+                      <li><a href="/stops/departures/{{ id }}?date={{ date }}&time={{ time }}">Departures</a></li>
                 {% endif %}
                 <li><a href="/stops/status/{{ id }}"> Status Info </a></li>
                 <li>

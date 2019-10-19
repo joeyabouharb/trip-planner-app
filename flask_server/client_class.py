@@ -88,7 +88,7 @@ class Client:
             date_str, time = create_date_and_time(date_time, format_date, format_time)
         else:
             date_str, time = date_time
-            is_date = date_parser(f'{date_str} {time}', '%Y/%m/%d %I:%M%p')
+            is_date = date_parser(f'{date_str} {time}', '%Y-%m-%d %I:%M%p')
             if is_date:
                 date_str, time = create_date_and_time(is_date, format_date, format_time)
         # sends a request to the api using the swagger instance
