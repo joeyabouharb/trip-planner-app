@@ -16,10 +16,12 @@ class Cache:
     """
     def __init__(self, filename):
         self.filename = filename + '.json'
-        self.data = []
+        self.data = {
+            "trips": []
+        }
         path = Path(self.filename)
         if not path.is_file():
-            self.write_db(self.data, update=False)
+            self.write_db(None, update=False)
 
     def write_db(self, data, update=True):
         """
@@ -30,10 +32,10 @@ class Cache:
         """
         if update:
             self.read_db()
-            self.data.append(data)
+            self.data['trips'].append(data)
         try:
             with open(self.filename, 'w+') as database:
-                json.dump(self.data, database, indent=2)
+                json.dump({"data": self.data}, database, indent=2)
         except json.JSONDecodeError as err:
             raise err
 
@@ -44,4 +46,4 @@ class Cache:
         """
         with open(self.filename, 'r') as database:
             data = json.load(database)
-        self.data = data
+        self.data = data["data"]["trips"]

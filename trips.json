@@ -1,32 +1,16 @@
-[
-  [
-    [
-      "10101397",
-      "Belmore Station, Belmore"
-    ],
-    [
-      "10101112",
-      "North Sydney Station, North Sydney"
+{
+  "data": {
+    "trips": [
+      [
+        [
+          "10101397",
+          "Belmore Station, Belmore"
+        ],
+        [
+          "10101112",
+          "North Sydney Station, North Sydney"
+        ]
+      ]
     ]
-  ],
-  [
-    [
-      "poiID:858268243:95314005:1:Five Dock Bay:Chiswick:Five Dock Bay:ANY:POI:4883465:3753109:GDAV:nsw",
-      "Five Dock Bay, Chiswick"
-    ],
-    [
-      "10101112",
-      "North Sydney Station, North Sydney"
-    ]
-  ],
-  [
-    [
-      "10101397",
-      "Belmore Station, Belmore"
-    ],
-    [
-      "poiID:858271375:95301006:1:Royal Prince Alfred Hospital (RPA):Camperdown:Royal Prince Alfred Hospital (RPA):ANY:POI:4886774:3757799:GDAV:nsw",
-      "Royal Prince Alfred Hospital (RPA), Camperdown"
-    ]
-  ]
-]
+  }
+}

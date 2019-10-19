@@ -108,15 +108,13 @@ def plan_trip():
     if origin_stop and destination_stop:
 
         origins = g.client.find_stops_by_name('any', origin_stop, True)
-        print(origins)
-        print(g.client.error)
+
         if g.client.error == 404:
             render_template(
                 "trip-planner.jinja2", origins=[], destinations=[], err=404
             )
 
         destinations = g.client.find_stops_by_name('any', destination_stop, True)
-        print(g.client.error)
         if g.client.error == 404:
             render_template(
                 "trip-planner.jinja2", origins=[], destinations=[], err=404
@@ -143,7 +141,9 @@ def save_journey():
     destination = request.form.get('destination', ''), request.form.get('destination_name', '')
     origin = request.form.get('origin', ''), request.form.get('origin_name', '')
     if '' not in destination or '' not in origin:
-        g.trip_db.write_db((origin, destination))
+        g.trip_db.read_db()
+        if (origin, destination) in g.trip_db.data:
+            g.trip_db.write_db((origin, destination))
     return redirect('/')
 
 

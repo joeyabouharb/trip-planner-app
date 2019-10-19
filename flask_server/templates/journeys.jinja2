@@ -18,18 +18,6 @@
             {% for trip_stop in trip_stops %}
                 {% set stop_name, stop_time = trip_stop %}
                 <p> {{ stop_name }} <b>Arrives: </b> <em> {{ stop_time }} </em></p>
-                <script>
-                    function setMarkers(map) {
-                        for (let i = 0; i < {{ trip.coords|length }}; i++) {
-                            const marker = new google.maps.Marker({
-                                position: {lat: {{ trip.coords }}[i][0], lng: {{ trip.coords }}[i][1] },
-                                map: map,
-                                title: "{{ stop_name }}"
-                            })
-                        };
-                        return {{ trip.coords }};
-                    }
-                </script>
             {% endfor %}
         {% endfor %}
         </section>
@@ -43,26 +31,7 @@
             <section>
             <h4>Map:</h4>
             <div style="height: 400px" id="map"></div>
-            <script>
-                function initMap() {
-                    const map = new google.maps.Map(document.getElementById('map'), {
-                        center: {lat: -33.8688, lng: 151.2093},
-                        zoom: 10
-                    });
-                    const tripMarkers = setMarkers(map);
-                    const setPathway = tripMarkers.map(path => {
-                        return { lat: path[0], lng: path[1] }
-                    });
-                    const path = new google.maps.Polyline({
-                        path: setPathway,
-                        geodesic: true,
-                        strokeColor: '#0051a1',
-                        strokeOpacity: 1.0,
-                        strokeWeight: 2
-                    });
-                    path.setMap(map);
-                }
-            </script>
+
         </section>
 <nav>
     {% set pages = pages + 1 %}
@@ -73,7 +42,49 @@
         </a>
         {% endfor %}
 </nav>
-            <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4qDToErH19GfYzW5xOKeUmed61Y_C9Cs&callback=initMap">
-    </script>
+        <script>
+                    let map;
+                    function initMap() {
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            center: {lat: -33.8688, lng: 151.2093},
+                            zoom: 10
+                        });
+                        let tripMarkers = {{ trip.coords | tojson}};
+                        setPath(map, tripMarkers);
+                        setMarkers(tripMarkers);
+                    }
+                    function setPath(map, tripMarkers) {
+                        const setPathway = tripMarkers.map(path => {
+                            if (path !== null) {
+                                return {lat: path[0], lng: path[1]}
+                            }
+                        }).filter(el => el !== undefined);
+                        const path = new google.maps.Polyline({
+                            path: setPathway,
+                            geodesic: true,
+                            strokeColor: '#0051a1',
+                            strokeOpacity: 1.0,
+                            strokeWeight: 2
+                        });
+                        path.setMap(map);
+                    }
+                    function setMarkers(coordinates) {
+                        for (let i = 0; i < coordinates.length; i++) {
+                            const coord = coordinates[i];
+                            if (coord !== null) {
+                                const marker = new google.maps.Marker({
+                                    position: {
+                                        lat: coord[0],
+                                        lng: coord[1]
+                                    },
+                                    map: map,
+                                    title: "{{ stop_name }}"
+                                })
+                            }
+                        }
+                    }
+        </script>
+        <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4qDToErH19GfYzW5xOKeUmed61Y_C9Cs&callback=initMap">
+        </script>
     {% endblock %}

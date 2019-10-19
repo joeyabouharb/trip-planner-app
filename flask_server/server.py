@@ -10,11 +10,13 @@ Initialises Flask server with routes to:
 from os import environ
 import sys
 from dotenv import load_dotenv, find_dotenv
+from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, g
 from flask_server.client_class import Client
 from flask_server.routes.stops import STOP_BLUEPRINT
 from flask_server.routes.trips import TRIP_BLUEPRINT
 from flask_server.routes.index import INDEX_BLUEPRINT
+
 
 load_dotenv(find_dotenv())
 
@@ -57,7 +59,7 @@ def destroy_client(_):
     """
     destroy client object after request is handled
     """
-    g.pop('client', None)
+    g.pop('client')
 
 
 if __name__ == '__main__':

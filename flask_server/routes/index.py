@@ -24,14 +24,14 @@ def home():
     """
     trips_db = g.trips_db
     trips_db.read_db()
-    stops = trips_db.data
+
     if g.client.error in [500, 404]:
         return render_template(
             'index.jinja2', trips=[], names=[],
             error="Connection to API Failed."
         ), 404
 
-    return render_template('index.jinja2', trips=stops)
+    return render_template('index.jinja2', trips=trips_db.data)
 
 
 @INDEX_BLUEPRINT.teardown_request

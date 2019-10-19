@@ -10,8 +10,7 @@ from swagger_client.models.additional_info_response import AdditionalInfoRespons
 from swagger_client.models.departure_monitor_response import DepartureMonitorResponse
 from swagger_client.models.stop_finder_response import StopFinderResponse
 from swagger_client.models.trip_request_response import TripRequestResponse
-from swagger_client.rest import ApiException
-
+from urllib3.util.retry import MaxRetryError
 import flask_server.services.swagger_instance as instance
 from flask_server.services.app_locals import JSON_FORMAT, COORDINATE_FORMAT
 from flask_server.services.data_service import create_date_and_time, date_parser
@@ -52,7 +51,7 @@ class Client:
             )
             print(req)
             self.error = 404 if not req.locations else 200
-        except ApiException as err:
+        except MaxRetryError as err:
             print(err)
             req = None
             self.error = 404
@@ -94,7 +93,7 @@ class Client:
                 mode='direct', tf_nswdm="true", version=self.version
             )
             self.error = 404 if req.stop_events is None else 200
-        except ApiException as err:
+        except MaxRetryError as err:
             print(err)
             req = None
             self.error = 404
@@ -142,7 +141,7 @@ class Client:
                 version=self.version
             )
             self.error = 404 if req.journeys is None else 200
-        except ApiException as err:
+        except MaxRetryError as err:
             print(err)
             req = None
             self.error = 404

@@ -3,10 +3,12 @@
     {% block content %}
     <h2> Dashboard </h2>
     <div>
-    {% for origin, destination in trips %}
+    {% for trip in trips %}
+         {% set origin, destination = trip %}
+        {% set origin_id, origin_name = origin %}
+        {% set destination_id, destination_name = destination %}
         <p>
-            {% set origin_id, origin_name = origin %}
-            {% set destination_id, destination_name = destination %}
+
             <!--suppress HtmlUnknownTarget -->
             <a
                         href="/trip/journeys?origin={{ origin_id }}&dest={{ destination_id }}"
