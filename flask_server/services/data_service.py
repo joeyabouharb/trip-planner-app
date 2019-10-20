@@ -6,7 +6,6 @@ such as dates, etc
 """
 from datetime import datetime
 from typing import Sequence, Dict
-
 from dateutil import tz
 from swagger_client.models import (
     DepartureMonitorResponse, StopFinderLocation,
@@ -15,7 +14,18 @@ from swagger_client.models import (
 
 from flask_server.models.departure_info import DepartureInfo
 from flask_server.models.trip_journey import TripJourney
+import re
 
+def validate_date_time(date, time):
+    time_test = re.search('^(0[1-9]|1[0-2]):[0-5][0-9]([AP]M)$', time)
+    date_test = re.search(
+        '^([12][0-9][0-9][0-9]-([0][1-9]|[1][0-2])-([0][0-9]|[1-2][0-9]|[3][0-1]))$', date
+    )
+    if time_test is None or date_test is None:
+        date_time = None
+    else:
+        date_time = (date, time)
+    return date_time
 
 def stop_information_generator(
         locations: Sequence[StopFinderLocation],

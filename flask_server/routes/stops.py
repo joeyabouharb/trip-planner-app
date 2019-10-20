@@ -2,13 +2,12 @@
 /stops route
 """
 from flask import request, render_template, redirect, Blueprint, g
-
 from flask_server.services.app_locals import VALID_TRANSPORT
 from flask_server.services.cache_class import Cache
 from flask_server.services.data_service import (
     stop_information_generator, departure_info_generator,
-    status_info_generator
-)
+    status_info_generator,
+    validate_date_time)
 from flask_server.client_class import Client
 
 STOP_BLUEPRINT = Blueprint('stops', __name__, url_prefix='/stops')
@@ -32,10 +31,9 @@ def get_departures(id_: str):
 
     date = request.args.get('date', '')
     time = request.args.get("time", '')
-    if not date or not time:
-        date_time = None
-    else:
-        date_time = (date, time)
+
+    date_time = validate_date_time(date, time)
+
     expected_type = request.args.get('expected_type', 'dep')
     departures = client.find_destinations_for(
         'any', id_, expected_type, date_time=date_time

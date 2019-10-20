@@ -2,12 +2,11 @@
 /trips route
 """
 from flask import request, render_template, Blueprint, g, redirect
-
 from flask_server.client_class import Client
 from flask_server.services.cache_class import Cache
-from flask_server.services.data_service import trip_journeys_generator, stop_information_generator
-
-
+from flask_server.services.data_service import (
+    trip_journeys_generator, stop_information_generator, validate_date_time
+)
 TRIP_BLUEPRINT = Blueprint('trips', __name__, url_prefix='/trip')
 
 
@@ -48,11 +47,11 @@ def get_trip_info():
             (type_origin, origin), (type_dest, destination), dep
         )
     else:
+        date_time = validate_date_time(date, time)
+
         trips = client.find_trips_for_stop(
-            (type_origin, origin), (type_dest, destination), dep, date_time=(date, time)
+            (type_origin, origin), (type_dest, destination), dep, date_time=date_time
         )
-        print(date, time)
-        print(trips)
     if client.error == 404:
         return render_template("404.jinja2"), 404
 
