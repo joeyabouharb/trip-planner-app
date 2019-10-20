@@ -30,9 +30,10 @@
             <p>No results Found.</p>
         {% else %}
         {% for id, location, geocode in data %}
+            <p>{{ location }}</p>
             <li>
                 {% if date is none or time is none %}
-                    <ul><span>{{ location }}</span>
+                    <ul>
                     <li><a href="/stops/departures/{{ id }}">Departures</a></li>
                 {% else %}
                       <li><a href="/stops/departures/{{ id }}?date={{ date }}&time={{ time }}">Departures</a></li>

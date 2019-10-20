@@ -55,7 +55,6 @@ def stop_information_generator(
         if is_suburb:
             if location.name.split(' ')[-1] != query.capitalize():
                 continue
-
         yield location.id, location.name, location.coord
 
 

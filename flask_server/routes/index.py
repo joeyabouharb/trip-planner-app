@@ -3,8 +3,8 @@ Index / Home Page
 """
 from flask import Blueprint, g, render_template
 
+from flask_server import CLIENT
 from flask_server.services.cache_class import Cache
-from flask_server.client_class import Client
 
 INDEX_BLUEPRINT = Blueprint('index', __name__)
 
@@ -26,7 +26,7 @@ def home():
     """
     trips_db: Cache = g.trips_db
     stops_db: Cache = g.stops_db
-    client: Client = g.client
+    client = CLIENT.connection
 
     trips_db.read_db()
     stops_db.read_db()

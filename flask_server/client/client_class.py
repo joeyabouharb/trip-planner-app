@@ -12,7 +12,6 @@ from swagger_client.models.stop_finder_response import StopFinderResponse
 from swagger_client.models.trip_request_response import TripRequestResponse
 from swagger_client.rest import ApiException
 from urllib3.util.retry import MaxRetryError
-import flask_server.services.swagger_instance as instance
 from flask_server.services.app_locals import JSON_FORMAT, COORDINATE_FORMAT
 from flask_server.services.data_service import create_date_and_time, date_parser
 
@@ -26,9 +25,9 @@ class Client:
     - `error`: int -> http error code / msg
     """
 
-    def __init__(self, key):
+    def __init__(self, instance=None):
         # start up swagger client instance upon initialisation
-        self._instance = instance.start(key)
+        self._instance = instance
         self.error = None
         self.data = None
         self.version = '10.2.1.42'  # stable version
