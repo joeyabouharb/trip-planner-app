@@ -3,7 +3,7 @@
 """
 from flask import request, render_template, Blueprint, g, redirect
 
-from flask_server import CLIENT
+from flask_server import client as api
 from flask_server.services.cache_class import Cache
 from flask_server.services.data_service import (
     trip_journeys_generator, stop_information_generator, validate_date_time
@@ -42,7 +42,7 @@ def get_trip_info():
     time = request.args.get('time', '')
     concession_type = request.args.get('concession_type', 'ADULT')
 
-    client = CLIENT.connection
+    client = api.connection()
     if not date or not time:
         trips = client.find_trips_for_stop(
             (type_origin, origin), (type_dest, destination), dep
@@ -79,7 +79,7 @@ def plan_trip():
     origin_is_suburb = bool(origin_is_suburb)
     dest_is_suburb = bool(dest_is_suburb)
     if origin_stop and destination_stop:
-        client = CLIENT.connection
+        client = api.connection()
         origins = client.find_stops_by_name('any', origin_stop, True)
 
         if client.error == 404:

@@ -123,11 +123,11 @@ class Client:
         - destination: tuple -> location of destination - ID or coordinates
             - specify ID with ('any', 'ID')
             - coordinates with ('coord', [long, lat])
-        **kwargs:-> containing additional information like:
-        - `date_time`: datetime: specified time
-        - `calc_num_of_trips`: total number of trips to be returned
-        - `wheelchair`: str -> default set to 'off'
-        set 'on' to return wheelchair accessible options
+        - **kwargs:-> containing additional information like:
+            - `date_time`: datetime: specified time
+            - `calc_num_of_trips`: total number of trips to be returned
+            - `wheelchair`: str -> default set to 'off'
+            set 'on' to return wheelchair accessible options
         """
         format_date = '%Y%m%d'
         format_time = '%H%M'

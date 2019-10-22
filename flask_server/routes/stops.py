@@ -3,7 +3,7 @@
 """
 from flask import request, render_template, redirect, Blueprint, g
 
-from flask_server import CLIENT
+from flask_server import client as api
 from flask_server.services.app_locals import VALID_TRANSPORT
 from flask_server.services.cache_class import Cache
 from flask_server.services.data_service import (
@@ -11,6 +11,7 @@ from flask_server.services.data_service import (
     status_info_generator,
     validate_date_time)
 from flask_server.client.client_class import Client
+
 
 STOP_BLUEPRINT = Blueprint('stops', __name__, url_prefix='/stops')
 
@@ -29,8 +30,7 @@ def get_departures(id_: str):
     """
     get departures for a certain stop ID
     """
-    client = CLIENT.connection
-
+    client = api.connection()
     date = request.args.get('date', '')
     time = request.args.get("time", '')
 
@@ -64,7 +64,7 @@ def get_status_info(id_):
     :param id_:
     :return: View
     """
-    client = CLIENT.connection
+    client = api.connection()
     statuses = client.request_status_info(id_).infos.current
     if client.error == 404:
         return render_template('statuses.jinja2', statuses=[])
@@ -92,7 +92,7 @@ def get_stop_information():
     returns a list of stops from entered key words
     :return:
     """
-    client = CLIENT.connection
+    client = api.connection()
 
     date = request.args.get('date', '')
     time = request.args.get("time", '')
