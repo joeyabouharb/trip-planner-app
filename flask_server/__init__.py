@@ -1,4 +1,4 @@
-"""#Flask Factory Method
+"""# Flask Factory Method
 Initialises Flask server with routes to:
     - /stops
     - /trips
@@ -9,12 +9,12 @@ to be loaded during a request contexts
 """
 
 from flask import Flask
-
+from dotenv import load_dotenv, find_dotenv
 from flask_server import client as api
 from flask_server.routes.trips import TRIP_BLUEPRINT
 from flask_server.routes.stops import STOP_BLUEPRINT
 from flask_server.routes.index import INDEX_BLUEPRINT
-from dotenv import load_dotenv, find_dotenv
+
 
 
 def create_app():

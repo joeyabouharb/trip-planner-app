@@ -140,11 +140,8 @@ def create_date_and_time(
     and the specified formats for date and time in `format_date` and `format_time`
 
     Args:
-
     date: datetime - date to format to str,
-
     format_date: str - specified date format,
-
     format_time: str - specified time format,
     """
 

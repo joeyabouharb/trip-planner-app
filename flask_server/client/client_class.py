@@ -133,14 +133,22 @@ class Client:
         format_time = '%H%M'
         departure, destination, dep = args
         if not kwargs.get('date_time', False):
-            date_time = datetime.now(tz.tzlocal()).astimezone(tz=tz.gettz('Australia/Sydney'))
+            date_time = datetime.now(
+                tz.tzlocal()).astimezone(tz=tz.gettz('Australia/Sydney')
+            )
             # format datetime to a string
-            date_str, time = create_date_and_time(date_time, format_date, format_time)
+            date_str, time = create_date_and_time(
+                date_time, format_date, format_time
+            )
         else:
             date_str, time = kwargs['date_time']
-            date_time = datetime.strptime(f'{date_str} {time}', '%Y-%m-%d %I:%M%p')
+            date_time = datetime.strptime(
+                f'{date_str} {time}', '%Y-%m-%d %I:%M%p'
+            )
             if date_time:
-                date_str, time = create_date_and_time(date_time, format_date, format_time)
+                date_str, time = create_date_and_time(
+                    date_time, format_date, format_time
+                )
 
         calc_number_of_trips = (
             5 if not kwargs.get('calc_number_of_trips', False)
@@ -154,17 +162,19 @@ class Client:
             )
             self.error = 404 if req.journeys is None else 200
             self.data = req
-        except MaxRetryError as err:
+        except MaxRetryError as err:  # server cannot be reached
             print(err)
             self.data = None
             self.error = 404
-        except ApiException as err:
+        except ApiException as err:  # server rejected request
             print(err)
             self.data = None
             self.error = 404
         return self.data
 
-    def request_status_info(self, stop, publication_status="current") -> AdditionalInfoResponse:
+    def request_status_info(
+            self, stop, publication_status="current"
+    ) -> AdditionalInfoResponse:
         """
         find detailed status reports on potential, train works, delays for specified stops.
         """

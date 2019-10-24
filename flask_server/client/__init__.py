@@ -1,3 +1,6 @@
+"""# Client Factory
+creates an API client instance for a flask request
+"""
 from flask import current_app
 
 from flask_server.client.client_class import Client
@@ -40,4 +43,3 @@ def connection() -> Client:
     return Client(
         current_app.extensions['swagger_client']
     )
-

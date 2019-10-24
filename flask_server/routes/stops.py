@@ -10,7 +10,7 @@ from flask_server.services.data_service import (
     stop_information_generator, departure_info_generator,
     status_info_generator,
     validate_date_time)
-from flask_server.client.client_class import Client
+
 
 
 STOP_BLUEPRINT = Blueprint('stops', __name__, url_prefix='/stops')
