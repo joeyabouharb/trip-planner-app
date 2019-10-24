@@ -134,8 +134,8 @@ class Client:
         departure, destination, dep = args
         if not kwargs.get('date_time', False):
             date_time = datetime.now(
-                tz.tzlocal()).astimezone(tz=tz.gettz('Australia/Sydney')
-            )
+                tz.tzlocal()
+            ).astimezone(tz=tz.gettz('Australia/Sydney'))
             # format datetime to a string
             date_str, time = create_date_and_time(
                 date_time, format_date, format_time
