@@ -26,15 +26,9 @@ def home():
     """
     trips_db: Cache = g.trips_db
     stops_db: Cache = g.stops_db
-    client = api.connection()
 
     trips_db.read_db()
     stops_db.read_db()
-    if client.error == 404:
-        return render_template(
-            'index.jinja2', trips=[], names=[],
-            error="Connection to API Failed."
-        ), 404
 
     return render_template(
         'index.jinja2',
