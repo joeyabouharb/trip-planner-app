@@ -9,6 +9,7 @@ to be loaded during a request contexts
 """
 
 from flask import Flask
+from werkzeug.exceptions import ServiceUnavailable, InternalServerError
 from dotenv import load_dotenv, find_dotenv
 from flask_server import client as api
 from flask_server.routes.trips import TRIP_BLUEPRINT
@@ -30,12 +31,9 @@ def create_app():
         try:
             app.config.from_envvar('CONFIG')
             app.config.get('TRIP_PLANNER_API_KEY')
-        except RuntimeError:
-            raise KeyError('No .env or api key configured. closing')
-        except KeyError:
-            raise KeyError('No API Configured. closing')
-    api.init_app(app)
-    app.register_blueprint(STOP_BLUEPRINT)
-    app.register_blueprint(TRIP_BLUEPRINT)
-    app.register_blueprint(INDEX_BLUEPRINT)
-    return app
+        finally:
+            api.init_app(app)
+            app.register_blueprint(STOP_BLUEPRINT)
+            app.register_blueprint(TRIP_BLUEPRINT)
+            app.register_blueprint(INDEX_BLUEPRINT)
+            return app
