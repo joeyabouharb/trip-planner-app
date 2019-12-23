@@ -13,6 +13,7 @@ Spins a Flask HTTP Server that fetches Public transport infofrom the NSW OPEN DA
 As listed in the requirements text file, this requires:
 
 - Flask
+- An API Key from the Open-Data Platform. Its free :smirk:
 - datetime module with the dateutils extension
 - auto-generated swagger client for API connectivity. This package is served on my github, with some changes which you can view here:
 https://github.com/joeyabouharb/opendata-swagger.
@@ -23,11 +24,11 @@ https://github.com/joeyabouharb/opendata-swagger.
 
 ```bash
 pip install -r requirements.txt (or pipenv install) # for pipenv users
-pip install -e .
-# with gunicorn
-gunicorn flask_server:server.APP
+# pip install -e . to install as a package
+# with gunicorn as wsgi container
+gunicorn flask_server.start:APP
 # or
-FLASK_APP=flask_server/server.py flask run --host 0.0.0.0          
+FLASK_APP=flask_server flask run --host 0.0.0.0          
 
 ```
 
