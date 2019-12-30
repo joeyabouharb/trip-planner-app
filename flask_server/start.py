@@ -18,7 +18,7 @@ def not_found(_):
 
 
 @APP.errorhandler(500)
-def serviceUnavailable(_):
+def service_unavailable(_):
     """
     500 error handler
     """
