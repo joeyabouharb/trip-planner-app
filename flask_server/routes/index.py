@@ -3,7 +3,6 @@ Index / Home Page
 """
 from flask import Blueprint, g, render_template
 
-from flask_server import client as api
 from flask_server.services.cache_class import Cache
 
 INDEX_BLUEPRINT = Blueprint('index', __name__)

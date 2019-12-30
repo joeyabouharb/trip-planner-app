@@ -32,8 +32,8 @@ def create_app():
             app.config.get('TRIP_PLANNER_API_KEY')
         except Exception:
             raise RuntimeError("No API key Configired")
-        api.init_app(app)
-        app.register_blueprint(STOP_BLUEPRINT)
-        app.register_blueprint(TRIP_BLUEPRINT)
-        app.register_blueprint(INDEX_BLUEPRINT)
-        return app
+    api.init_app(app)
+    app.register_blueprint(STOP_BLUEPRINT)
+    app.register_blueprint(TRIP_BLUEPRINT)
+    app.register_blueprint(INDEX_BLUEPRINT)
+    return app

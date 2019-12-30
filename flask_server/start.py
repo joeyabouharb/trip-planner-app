@@ -11,10 +11,19 @@ APP = create_app()
 
 @APP.errorhandler(404)
 def not_found(_):
+    """
+    not found error
+    """
     return render_template("404.jinja2"), 404
 
+
 @APP.errorhandler(500)
-def serviceUnavailable(msg):
+def serviceUnavailable(_):
+    """
+    500 error handler
+    """
     return "Service Unavailable :(", 500
+
+
 if __name__ == '__main__':
     APP.run()
