@@ -18,8 +18,6 @@
 **/venv/
 venv/
 .env
-default.py
-flask_server/config/default.py
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
