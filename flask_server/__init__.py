@@ -26,12 +26,14 @@ def create_app():
     app = Flask(__name__)
     load_dotenv(find_dotenv())
     trip_api_key = app.config.get('TRIP_PLANNER_API_KEY', False)
+    print(trip_api_key)
     if not trip_api_key:
         try:
-            app.config.from_envvar('CONFIG')
-            app.config.get('TRIP_PLANNER_API_KEY')
+            #app.config.get('CONFIG')
+            #app.config.get('TRIP_PLANNER_API_KEY')
+            app.config.from_pyfile('config/default.py')
         except Exception:
-            raise RuntimeError("No API key Configired")
+            raise RuntimeError("No API key Configured")
     api.init_app(app)
     app.register_blueprint(STOP_BLUEPRINT)
     app.register_blueprint(TRIP_BLUEPRINT)
