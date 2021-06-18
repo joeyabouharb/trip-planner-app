@@ -21,7 +21,7 @@ six = "==1.12.0"
 swagger-client = {editable = true,git = "https://github.com/joeyabouharb/opendata-swagger",ref = "master"}
 trip-planner = {editable = true,git = "https://github.com/joeyabouharb/trip-planner-app.git",ref = "master"}
 typed-ast = "==1.4.0"
-urllib3 = "==1.25.6"
+urllib3 = "==1.26.5"
 wrapt = "==1.11.2"
 Flask = "==1.1.1"
 Jinja2 = "==2.10.3"
